@@ -1,4 +1,4 @@
-# yuquex
+# yuquey
 
 ## Introduction
 
@@ -6,11 +6,9 @@
 
 ## Dev
 
-vue: ^3.0.0,
+gin-gonic/gin v1.7.7
 
-vue-router: ^4.0.0-0,
-
-vuex: ^4.0.2"
+jinzhu/gorm v1.9.16
 
 ## About Author
 

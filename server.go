@@ -11,6 +11,13 @@ func main() {
 	db := common.InitDB()
 	defer db.Close()
 
-	r.POST("/api/auth/register", controller.Register)
+	//apiV1
+	apiV1 := r.Group("/api/v1")
+	//ws := r.Group("/ws")
+
+	//test
+	test := apiV1.Group("/auth")
+	test.POST("/register", controller.Register)
+
 	panic(r.Run())
 }

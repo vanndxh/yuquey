@@ -25,7 +25,7 @@ func InitDB() *gorm.DB {
 
 	db, err := gorm.Open(driverName, args)
 	if err != nil {
-		panic("failed to connect database, err:" + err.Error())
+		//panic("failed to connect database, err:" + err.Error())
 	}
 	DB = db
 	return db
