@@ -1,4 +1,4 @@
-package common
+package database
 
 import (
 	"fmt"
@@ -22,6 +22,6 @@ func init() {
 	if err != nil {
 		panic("failed to connect database, err:" + err.Error())
 	}
-	DB.AutoMigrate(&model.UserData{})
+	DB.AutoMigrate(&model.User{})
 	fmt.Println("success")
 }
