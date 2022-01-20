@@ -3,34 +3,25 @@ package common
 import (
 	"fmt"
 	"github.com/jinzhu/gorm"
+	_ "github.com/lib/pq"
+	"yuquey/model"
 )
 
 var DB *gorm.DB
 
-func InitDB() *gorm.DB {
-	driverName := "mysql"
+func init() {
+	var err error
 	host := "localhost"
-	port := "3306"
-	database := "ginessential"
-	username := "root"
-	password := "root"
-	charset := "utf8"
-	args := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=true",
-		username,
-		password,
-		host,
-		port,
-		database,
-		charset)
-
-	db, err := gorm.Open(driverName, args)
+	port := 1101
+	database := "yuquey"
+	username := "postgres"
+	password := "vanndxh1101"
+	psgInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		host, port, username, password, database)
+	DB, err = gorm.Open("postgres", psgInfo)
 	if err != nil {
-		//panic("failed to connect database, err:" + err.Error())
+		panic("failed to connect database, err:" + err.Error())
 	}
-	DB = db
-	return db
-}
-
-func GetDB() *gorm.DB {
-	return DB
+	DB.AutoMigrate(&model.UserData{})
+	fmt.Println("success")
 }

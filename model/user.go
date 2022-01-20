@@ -4,7 +4,10 @@ import "github.com/jinzhu/gorm"
 
 type User struct {
 	gorm.Model
-	Name      string `gorm:"type:varchar(20);not null"`
-	Telephone string `gorm:"varchar(11);not null;unique"`
-	Password  string `gorm:"size:255;not null"`
+	UserId        string `gorm:"varchar(6);not null"`
+	Username      string `gorm:"varchar(20);not null"`
+	Password      string `gorm:"size:255;not null"`
+	UserInfo      string `gorm:"varchar(200)"`
+	ArticleAmount int8   `gorm:"int8;not null"`
+	LikeTotal     int8   `gorm:"int8;not null"`
 }
