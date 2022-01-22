@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"yuquey/api/user"
+	"yuquey/api"
 )
 
 func main() {
@@ -13,9 +13,19 @@ func main() {
 	//ws := r.Group("/ws")
 
 	// user
-	us := apiV1.Group("/auth")
-	us.POST("/register", user.Register)
-	us.GET("getUserInfo", user.GetUserInfo)
+	us := apiV1.Group("/user")
+	us.POST("/register", api.Register)
+	us.POST("/signIn", api.SignIn)
+	us.GET("/getUserInfo", api.GetUserInfo)
+
+	// timeline
+	tl := apiV1.Group("/timeline")
+	tl.GET("/getTimeline", api.GetTimeline)
+
+	// article
+	a := apiV1.Group("/article")
+	a.GET("/getArticleInfo", api.GetArticleInfo)
+	a.POST("/createArticle", api.CreateArticle)
 
 	panic(r.Run("0.0.0.0:8080"))
 }
