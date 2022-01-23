@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"yuquey/model"
@@ -9,9 +8,12 @@ import (
 
 func GetTimeline(c *gin.Context) {
 	var tl model.Timeline
-	fmt.Println(tl)
-
 	// 返回表单
-	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "success", "data": "test"})
-
+	returnJSON := make(map[string]interface{})
+	returnJSON["Time"] = tl.Time
+	returnJSON["Title"] = tl.Title
+	returnJSON["Type"] = tl.Type
+	returnJSON["Content"] = tl.Content
+	// 返回表单
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "success", "data": returnJSON})
 }

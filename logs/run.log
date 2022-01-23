@@ -1,0 +1,1 @@
+[GIN] 2022/01/23 - 06:27:34 | 404 |       801.6µs |      172.18.0.1 | GET      "/stat?appid=1018&ver=2.4.1.12&peerid=1062E5C697E2JT3Q&statnum=2&retry=0&errcode=&success=3&length=328&begin=1642865504&end=1642919254"

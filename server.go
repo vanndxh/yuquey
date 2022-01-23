@@ -18,14 +18,20 @@ func main() {
 	us.POST("/signIn", api.SignIn)
 	us.GET("/getUserInfo", api.GetUserInfo)
 
-	// timeline
-	tl := apiV1.Group("/timeline")
-	tl.GET("/getTimeline", api.GetTimeline)
-
 	// article
 	a := apiV1.Group("/article")
 	a.GET("/getArticleInfo", api.GetArticleInfo)
 	a.POST("/createArticle", api.CreateArticle)
+	a.GET("/getHotArticle", api.GetHotArticle)
+	a.DELETE("/deleteArticle", api.DeleteArticle)
+
+	// timeline
+	tl := apiV1.Group("/timeline")
+	tl.GET("/getTimeline", api.GetTimeline)
+
+	// supportCount
+	sc := apiV1.Group("/supportCount")
+	sc.GET("/getSupportCount", api.GetSupportCount)
 
 	panic(r.Run("0.0.0.0:8080"))
 }
