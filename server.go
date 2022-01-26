@@ -24,6 +24,7 @@ func main() {
 	a.POST("/createArticle", api.CreateArticle)
 	a.GET("/getHotArticle", api.GetHotArticle)
 	a.DELETE("/deleteArticle", api.DeleteArticle)
+	a.PUT("/updateArticle", api.UpdateArticle)
 
 	// timeline
 	tl := apiV1.Group("/timeline")

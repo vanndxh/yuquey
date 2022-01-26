@@ -1,8 +1,8 @@
 package api
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
 	"strconv"
 	"yuquey/database"
@@ -32,13 +32,13 @@ func CreateArticle(c *gin.Context) {
 
 	//创建文章
 	newArticle := model.Article{
-		ArticleId:      "100000001",
+		ArticleId:      100001,
 		ArticleName:    articleName,
 		ArticleContent: articleContent,
 	}
 	err := database.DB.Create(&newArticle).Error
 	if err != nil {
-		log.Println(err)
+		fmt.Println(err)
 	}
 
 	// 返回结果
@@ -48,16 +48,21 @@ func CreateArticle(c *gin.Context) {
 }
 
 func DeleteArticle(c *gin.Context) {
-	articleId, err := strconv.Atoi(c.Param("articleId"))
+	// 获取文章id
+	var a model.Article
+	id, err := strconv.Atoi(c.Param("articleId"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": err.Error()})
 		return
 	}
-	result := database.DB.Delete(&model.Article{}, articleId)
+
+	// 删除操作
+	result := database.DB.Delete(&a, "article_id=?", id)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
 	}
+
 	// 返回结果
 	c.JSON(200, gin.H{
 		"msg": "文章删除成功！",
@@ -65,25 +70,44 @@ func DeleteArticle(c *gin.Context) {
 }
 
 func GetArticleInfo(c *gin.Context) {
+	// 获取数据
 	var a model.Article
+	id := c.Param("articleId")
+
+	// 查找对应文章
+	result := database.DB.Find(&a, "article_id=?", id)
+	fmt.Println(result)
+
 	// 返回表单
 	returnJSON := make(map[string]interface{})
 	returnJSON["ArticleName"] = a.ArticleName
 	returnJSON["ArticleContent"] = a.ArticleContent
 	returnJSON["LikeAmount"] = a.LikeAmount
 	returnJSON["StarAmount"] = a.StarAmount
-
+	returnJSON["Hot"] = a.Hot
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "success", "data": returnJSON})
 }
 
 func GetHotArticle(c *gin.Context) {
+	// 获取数据
 	var a model.Article
+	id := c.Param("articleId")
+
+	// 查找对应文章
+	result := database.DB.Find(&a, "article_id=?", id)
+	fmt.Println(result)
+
 	// 返回表单
 	returnJSON := make(map[string]interface{})
 	returnJSON["ArticleName"] = a.ArticleName
 	returnJSON["ArticleContent"] = a.ArticleContent
 	returnJSON["LikeAmount"] = a.LikeAmount
 	returnJSON["StarAmount"] = a.StarAmount
-
+	returnJSON["Hot"] = a.Hot
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "success", "data": returnJSON})
+}
+
+func UpdateArticle(c *gin.Context) {
+
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "success", "data": "test"})
 }
