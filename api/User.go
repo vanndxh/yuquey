@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	"strconv"
 	"yuquey/database"
 	"yuquey/model"
 )
@@ -97,15 +96,9 @@ func SignIn(c *gin.Context) {
 func GetUserInfo(c *gin.Context) {
 	// 获取登录信息
 	var user model.User
-	id, err := strconv.Atoi(c.Param("userId"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": err.Error()})
-		return
-	}
-
+	userId := c.PostForm("userId")
 	// 查找用户
-	database.DB.Find(&user, "user_id", id)
-
+	database.DB.Find(&user, "user_id=?", userId)
 	// 返回表单
 	returnJSON := make(map[string]interface{})
 	returnJSON["UserId"] = user.UserId
