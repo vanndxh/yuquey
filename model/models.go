@@ -1,7 +1,7 @@
 package model
 
 type User struct {
-	UserId        int    `gorm:"primary_key;not null;unique"`
+	UserId        int    `gorm:"primary_key;AUTO_INCREASE"`
 	Username      string `gorm:"varchar(20);not null"`
 	Password      string `gorm:"size:255;not null"`
 	UserInfo      string `gorm:"varchar(200)"`
@@ -10,11 +10,12 @@ type User struct {
 }
 
 type Article struct {
-	ArticleId      int    `gorm:"primary_key;not null"`
+	ArticleId      int    `gorm:"primary_key;AUTO_INCREASE"`
 	ArticleName    string `gorm:"varchar(20);not null"`
 	ArticleContent string `gorm:"varchar(200);not null"`
 	LikeAmount     int    `gorm:"not null"`
 	StarAmount     int    `gorm:"not null"`
+	IsInTrash      int    `gorm:"not null"`
 	Hot            int    `gorm:"not null"`
 }
 
@@ -37,4 +38,19 @@ type Like struct {
 type Star struct {
 	UserId    int `gorm:"not null"`
 	ArticleId int `gorm:"not null"`
+}
+
+type Team struct {
+	TeamId      int    `gorm:"primary_key;AUTO_INCREASE"`
+	TeamName    string `gorm:"varchar(10);not null"`
+	TeamNotice  string `gorm:"varchar(40)"`
+	TeamLeader  int    `gorm:"not null"`
+	TeamMember1 int    `gorm:""`
+	TeamMember2 int    `gorm:""`
+	TeamMember3 int    `gorm:""`
+	TeamMember4 int    `gorm:""`
+}
+
+type Feedback struct {
+	FeedbackInfo string `gorm:"varchar(200);not null"`
 }

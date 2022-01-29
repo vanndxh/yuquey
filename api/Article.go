@@ -12,7 +12,6 @@ func CreateArticle(c *gin.Context) {
 	// 获取数据
 	articleName := c.PostForm("articleName")
 	articleContent := c.PostForm("articleContent")
-
 	// 判断数据合理性
 	if len(articleName) == 0 {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
@@ -28,22 +27,32 @@ func CreateArticle(c *gin.Context) {
 		})
 		return
 	}
-
-	//创建文章
+	// 创建新文章
 	newArticle := model.Article{
-		ArticleId:      100001,
 		ArticleName:    articleName,
 		ArticleContent: articleContent,
 	}
 	err := database.DB.Create(&newArticle).Error
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
-
 	// 返回结果
 	c.JSON(200, gin.H{
 		"msg": "文章创建成功！",
 	})
+}
+
+func TransToTrash(c *gin.Context) {
+	var a model.Article
+	articleId := c.PostForm("articleId")
+	result := database.DB.Find(&a, "article_id=?", articleId)
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
+		return
+	}
+	database.DB.Model(&a).Update("is_in_trash", 1)
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "success", "data": "成功移入垃圾箱！"})
 }
 
 func DeleteArticle(c *gin.Context) {

@@ -13,7 +13,6 @@ func Register(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 	rePassword := c.PostForm("rePassword")
-
 	// 判断合理性
 	if len(password) == 0 {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
@@ -42,10 +41,8 @@ func Register(c *gin.Context) {
 		})
 		return
 	}
-
 	// 创建用户
 	newUser := model.User{
-		UserId:   100001,
 		Username: username,
 		Password: password,
 	}

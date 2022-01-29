@@ -24,7 +24,8 @@ func main() {
 	a.POST("/createArticle", api.CreateArticle)
 	a.GET("/getHotArticle", api.GetHotArticle)
 	a.DELETE("/deleteArticle", api.DeleteArticle)
-	a.POST("/updateArticle", api.UpdateArticle)
+	a.PUT("/transToTrash", api.TransToTrash)
+	a.PUT("/updateArticle", api.UpdateArticle)
 
 	// timeline
 	tl := apiV1.Group("/timeline")
@@ -33,6 +34,27 @@ func main() {
 	// supportCount
 	sc := apiV1.Group("/supportCount")
 	sc.GET("/getSupportCount", api.GetSupportCount)
+
+	// feedback
+	fb := apiV1.Group("/feedback")
+	fb.POST("/submitFeedback", api.SubmitFeedback)
+
+	// team
+	t := apiV1.Group("/team")
+	t.POST("/createTeam", api.CreateTeam)
+	t.DELETE("/deleteTeam", api.DeleteTeam)
+	t.GET("/getTeam", api.GetTeam)
+
+	// like
+	l := apiV1.Group("/like")
+	l.POST("/addLike", api.AddLike)
+	l.POST("cancelLike", api.CancelLike)
+
+	// star
+	s := apiV1.Group("/star")
+	s.POST("/addStar", api.AddStar)
+	s.POST("cancelStar", api.CancelStar)
+	s.GET("/getFavorite", api.GetFavorite)
 
 	panic(r.Run("0.0.0.0:8080"))
 }

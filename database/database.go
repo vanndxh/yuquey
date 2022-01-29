@@ -22,6 +22,7 @@ func init() {
 	if err != nil {
 		panic("failed to connect database, err:" + err.Error())
 	}
+	// 自动建表
 	DB.AutoMigrate(&model.User{}, &model.Article{}, &model.Timeline{}, &model.SupportCount{}, &model.Like{},
-		&model.Star{})
+		&model.Star{}, &model.Feedback{}, &model.Team{})
 }
