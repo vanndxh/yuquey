@@ -13,48 +13,48 @@ func main() {
 	//ws := r.Group("/ws")
 
 	// user
-	us := apiV1.Group("/user")
-	us.POST("/register", api.Register)
-	us.POST("/signIn", api.SignIn)
-	us.GET("/getUserInfo", api.GetUserInfo)
+	V1user := apiV1.Group("/user")
+	V1user.POST("/register", api.Register)
+	V1user.POST("/signIn", api.SignIn)
+	V1user.GET("/getUserInfo", api.GetUserInfo)
 
 	// article
-	a := apiV1.Group("/article")
-	a.GET("/getArticleInfo", api.GetArticleInfo)
-	a.POST("/createArticle", api.CreateArticle)
-	a.GET("/getHotArticle", api.GetHotArticle)
-	a.DELETE("/deleteArticle", api.DeleteArticle)
-	a.PUT("/transToTrash", api.TransToTrash)
-	a.PUT("/updateArticle", api.UpdateArticle)
+	V1article := apiV1.Group("/article")
+	V1article.GET("/getArticleInfo", api.GetArticleInfo)
+	V1article.POST("/createArticle", api.CreateArticle)
+	V1article.GET("/getHotArticle", api.GetHotArticle)
+	V1article.DELETE("/deleteArticle", api.DeleteArticle)
+	V1article.PUT("/transToTrash", api.TransToTrash)
+	V1article.PUT("/updateArticle", api.UpdateArticle)
 
 	// timeline
-	tl := apiV1.Group("/timeline")
-	tl.GET("/getTimeline", api.GetTimeline)
+	V1timeline := apiV1.Group("/timeline")
+	V1timeline.GET("/getTimeline", api.GetTimeline)
 
 	// supportCount
-	sc := apiV1.Group("/supportCount")
-	sc.GET("/getSupportCount", api.GetSupportCount)
+	V1supportCount := apiV1.Group("/supportCount")
+	V1supportCount.GET("/getSupportCount", api.GetSupportCount)
 
 	// feedback
-	fb := apiV1.Group("/feedback")
-	fb.POST("/submitFeedback", api.SubmitFeedback)
+	V1feedback := apiV1.Group("/feedback")
+	V1feedback.POST("/submitFeedback", api.SubmitFeedback)
 
 	// team
-	t := apiV1.Group("/team")
-	t.POST("/createTeam", api.CreateTeam)
-	t.DELETE("/deleteTeam", api.DeleteTeam)
-	t.GET("/getTeam", api.GetTeam)
+	V1team := apiV1.Group("/team")
+	V1team.POST("/createTeam", api.CreateTeam)
+	V1team.DELETE("/deleteTeam", api.DeleteTeam)
+	V1team.GET("/getTeam", api.GetTeam)
 
 	// like
-	l := apiV1.Group("/like")
-	l.POST("/addLike", api.AddLike)
-	l.POST("cancelLike", api.CancelLike)
+	V1like := apiV1.Group("/like")
+	V1like.POST("/addLike", api.AddLike)
+	V1like.POST("cancelLike", api.CancelLike)
 
 	// star
-	s := apiV1.Group("/star")
-	s.POST("/addStar", api.AddStar)
-	s.POST("cancelStar", api.CancelStar)
-	s.GET("/getFavorite", api.GetFavorite)
+	V1star := apiV1.Group("/star")
+	V1star.POST("/addStar", api.AddStar)
+	V1star.POST("cancelStar", api.CancelStar)
+	V1star.GET("/getFavorite", api.GetFavorite)
 
 	panic(r.Run("0.0.0.0:8080"))
 }
