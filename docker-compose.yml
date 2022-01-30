@@ -1,41 +1,27 @@
 version: "3.7"
 
 services:
-  postgres:
-    image: "postgres:13-alpine"
-    restart: "always"
+  pg:
+    image: postgres:alpine  # 基础镜像
+    container_name: "fund_postgres"  # 容器名称
+    ports:
+      - "1101:1101"
+    volumes:
+      - pg-data:/var/lib/postgresql/data  # 数据卷挂载
     environment:
-      POSTGRES_PASSWORD: "vanndxh1101"
-      POSTGRES_USER: "postgres"
-      PGDATA: "/var/lib/postgresql/data/pgdata"
-      TZ: "Asia/Shanghai"
-    ports:
-      - 1101:1101
-    volumes:
-      - "./init.sql:/docker-entrypoint-initdb.d/10-init.sql"
+      - POSTGRES_DB=yuquey  # 数据库名
+      - POSTGRES_USER=postgres  # 数据库用户
+      - POSTGRES_PASSWORD=vanndxh1101  # 数据库密码
   go:
-    build: .
+    container_name: "fund_go"
+    build: .  # Dockerfile文件目录
     restart: always
-    image: "golang:alpine"
     ports:
-      - 8080:8080
+      - "8080:8080"
+    links:
+      - pg
     depends_on:
-      - "postgres"
-    links:
-      - "postgres"
-    volumes:
-      - "./config.json:/build/config.json"
-      - "./logs/run.log:/build/logs/run.log"
-      - "./logs/db.log:/build/logs/db.log"
-  nginx:
-    restart: always
-    image: "nginx:alpine"
-    ports: 
-      - 80:80
-    volumes: 
-      - ./nginx/html:/usr/share/nginx
-      - ./nginx/conf:/etc/nginx
-    depends_on: 
-      - "go"
-    links:
-      - "go"
+      - pg
+
+volumes: # 数据卷
+  pg-data:

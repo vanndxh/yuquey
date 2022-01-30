@@ -1,3 +1,0 @@
-
-2022/01/25 05:19:51 /build/ApiV1/init.go:81
-[error] failed to initialize database, got error failed to connect to `host=postgres user=postgres database=yuquey`: dial error (dial tcp 172.19.0.2:1101: connect: connection refused)

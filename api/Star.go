@@ -72,12 +72,13 @@ func GetFavorite(c *gin.Context) {
 	var s []model.Star
 	var a []model.Article
 	userId := c.PostForm("userId")
-
+	// 先取articleId
 	subQuery := database.DB.Select("article_id").Where("user_id=?", userId).Find(&s)
 	if subQuery.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": subQuery.Error.Error()})
 		return
 	}
+	// id切片存入[]int
 	idSlice := make([]int, len(s))
 	for i := range s {
 		idSlice[i] = s[i].ArticleId

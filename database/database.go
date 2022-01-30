@@ -19,6 +19,7 @@ func init() {
 	psgInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, username, password, database)
 	DB, err = gorm.Open("postgres", psgInfo)
+	DB.LogMode(true)
 	if err != nil {
 		panic("failed to connect database, err:" + err.Error())
 	}
