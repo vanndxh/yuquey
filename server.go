@@ -54,12 +54,14 @@ func main() {
 	V1like := apiV1.Group("/like")
 	V1like.POST("/addLike", api.AddLike)
 	V1like.POST("cancelLike", api.CancelLike)
+	V1like.GET("/judgeIsLiked", api.JudgeIsLiked)
 
 	// star
 	V1star := apiV1.Group("/star")
 	V1star.POST("/addStar", api.AddStar)
 	V1star.POST("cancelStar", api.CancelStar)
 	V1star.GET("/getFavorite", api.GetFavorite)
+	V1like.GET("/judgeIsStared", api.JudgeIsStared)
 
 	panic(r.Run("0.0.0.0:8080"))
 }

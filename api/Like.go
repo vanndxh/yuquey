@@ -67,3 +67,30 @@ func CancelLike(c *gin.Context) {
 		"msg": "取消点赞成功！",
 	})
 }
+
+func JudgeIsLiked(c *gin.Context) {
+	var l model.Like
+	// 获取数据
+	userId, err := strconv.Atoi(c.PostForm("userId"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	articleId, err2 := strconv.Atoi(c.PostForm("articleId"))
+	if err2 != nil {
+		fmt.Println(err2)
+		return
+	}
+	// 寻找对应实例
+	result := database.DB.Find(&l, "user_id=? AND article_id=?", userId, articleId)
+	// 返回表单
+	returnJSON1 := make(map[string]interface{})
+	returnJSON1["isLiked"] = true
+	returnJSON2 := make(map[string]interface{})
+	returnJSON2["isLiked"] = false
+	if result.RowsAffected != 0 {
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": returnJSON1})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": returnJSON2})
+	}
+}
