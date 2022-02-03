@@ -98,11 +98,11 @@ func GetUserInfo(c *gin.Context) {
 	database.DB.Find(&user, "user_id=?", userId)
 	// 返回表单
 	returnJSON := make(map[string]interface{})
-	returnJSON["UserId"] = user.UserId
-	returnJSON["Username"] = user.Username
-	returnJSON["Password"] = user.Password
-	returnJSON["UserInfo"] = user.UserInfo
-	returnJSON["ArticleAmount"] = user.ArticleAmount
-	returnJSON["LikeTotal"] = user.LikeTotal
+	returnJSON["userId"] = user.UserId
+	returnJSON["username"] = user.Username
+	returnJSON["password"] = user.Password
+	returnJSON["userInfo"] = user.UserInfo
+	returnJSON["articleAmount"] = user.ArticleAmount
+	returnJSON["likeTotal"] = user.LikeTotal
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "success", "data": returnJSON})
 }
