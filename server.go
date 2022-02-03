@@ -25,7 +25,18 @@ func main() {
 	V1article.GET("/getHotArticle", api.GetHotArticle)
 	V1article.DELETE("/deleteArticle", api.DeleteArticle)
 	V1article.PUT("/transToTrash", api.TransToTrash)
+	V1article.PUT("/transOutTrash", api.TransOutTrash)
 	V1article.PUT("/updateArticle", api.UpdateArticle)
+
+	// team
+	V1team := apiV1.Group("/team")
+	V1team.POST("/createTeam", api.CreateTeam)
+	V1team.DELETE("/deleteTeam", api.DeleteTeam)
+	V1team.GET("/getTeam", api.GetTeam)
+
+	// comment
+	V1comment := apiV1.Group("/comment")
+	V1comment.POST("/createComment", api.CreateComment)
 
 	// timeline
 	V1timeline := apiV1.Group("/timeline")
@@ -38,12 +49,6 @@ func main() {
 	// feedback
 	V1feedback := apiV1.Group("/feedback")
 	V1feedback.POST("/submitFeedback", api.SubmitFeedback)
-
-	// team
-	V1team := apiV1.Group("/team")
-	V1team.POST("/createTeam", api.CreateTeam)
-	V1team.DELETE("/deleteTeam", api.DeleteTeam)
-	V1team.GET("/getTeam", api.GetTeam)
 
 	// like
 	V1like := apiV1.Group("/like")

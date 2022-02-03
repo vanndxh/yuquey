@@ -10,6 +10,8 @@ gin-gonic/gin v1.7.7
 
 jinzhu/gorm v1.9.16
 
+lib/pq v1.10.4
+
 ## About Author
 
 qq 1025196468

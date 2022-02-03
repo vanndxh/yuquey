@@ -26,6 +26,24 @@ type Timeline struct {
 	Type    string `gorm:"varchar(20)"`
 }
 
+type Team struct {
+	TeamId      int    `gorm:"primary_key;AUTO_INCREASE"`
+	TeamName    string `gorm:"varchar(10);not null"`
+	TeamNotice  string `gorm:"varchar(40)"`
+	TeamLeader  int    `gorm:"not null"`
+	TeamMember1 int    `gorm:""`
+	TeamMember2 int    `gorm:""`
+	TeamMember3 int    `gorm:""`
+	TeamMember4 int    `gorm:""`
+}
+
+type Comment struct {
+	CommentId      int    `gorm:"primary_key;AUTO_INCREASE"`
+	UserId         int    `gorm:"not null"`
+	ArticleId      int    `gorm:"not null"`
+	CommentContent string `gorm:"not null"`
+}
+
 type SupportCount struct {
 	Count int `gorm:"not null"`
 }
@@ -38,17 +56,6 @@ type Like struct {
 type Star struct {
 	UserId    int `gorm:"not null"`
 	ArticleId int `gorm:"not null"`
-}
-
-type Team struct {
-	TeamId      int    `gorm:"primary_key;AUTO_INCREASE"`
-	TeamName    string `gorm:"varchar(10);not null"`
-	TeamNotice  string `gorm:"varchar(40)"`
-	TeamLeader  int    `gorm:"not null"`
-	TeamMember1 int    `gorm:""`
-	TeamMember2 int    `gorm:""`
-	TeamMember3 int    `gorm:""`
-	TeamMember4 int    `gorm:""`
 }
 
 type Feedback struct {

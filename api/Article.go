@@ -55,6 +55,18 @@ func TransToTrash(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "success", "data": "成功移入垃圾箱！"})
 }
 
+func TransOutTrash(c *gin.Context) {
+	var a model.Article
+	articleId := c.PostForm("articleId")
+	result := database.DB.Find(&a, "article_id=?", articleId)
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
+		return
+	}
+	database.DB.Model(&a).Update("is_in_trash", 0)
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "success", "data": "成功移出垃圾箱！"})
+}
+
 func DeleteArticle(c *gin.Context) {
 	// 获取文章id
 	var a model.Article
