@@ -89,6 +89,10 @@ func GetArticleInfo(c *gin.Context) {
 	articleId := c.PostForm("articleId")
 	// 查找对应文章
 	result := database.DB.Find(&a, "article_id=?", articleId)
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
+		return
+	}
 	// 返回表单
 	returnJSON := make(map[string]interface{})
 	returnJSON["ArticleName"] = a.ArticleName
@@ -100,6 +104,21 @@ func GetArticleInfo(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": returnJSON})
 	} else {
 		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "msg": "This article is not exist."})
+	}
+}
+
+func GetArticles(c *gin.Context) {
+	var a []model.Article
+	articleAuthor := c.PostForm("articleAuthor")
+	result := database.DB.Find(&a, "article_author=?", articleAuthor)
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
+		return
+	}
+	if result.RowsAffected != 0 {
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": result})
+	} else {
+		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "msg": "The articles are not exist."})
 	}
 }
 

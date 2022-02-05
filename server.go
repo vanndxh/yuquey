@@ -22,6 +22,7 @@ func main() {
 	// article
 	V1article := apiV1.Group("/article")
 	V1article.GET("/getArticleInfo", api.GetArticleInfo)
+	V1article.GET("/getArticles", api.GetArticles)
 	V1article.POST("/createArticle", api.CreateArticle)
 	V1article.GET("/getHotArticle", api.GetHotArticle)
 	V1article.DELETE("/deleteArticle", api.DeleteArticle)
