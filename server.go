@@ -34,7 +34,8 @@ func main() {
 	V1team := apiV1.Group("/team")
 	V1team.POST("/createTeam", api.CreateTeam)
 	V1team.DELETE("/deleteTeam", api.DeleteTeam)
-	V1team.GET("/getTeam", api.GetTeam)
+	V1team.GET("/getTeams", api.GetTeams)
+	V1team.GET("/getTeamInfo", api.GetTeamInfo)
 	V1team.PUT("/updateTeamInfo", api.UpdateTeamInfo)
 	V1team.PUT("/addTeamUser", api.AddTeamUser)
 

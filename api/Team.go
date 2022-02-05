@@ -49,7 +49,7 @@ func DeleteTeam(c *gin.Context) {
 	})
 }
 
-func GetTeam(c *gin.Context) {
+func GetTeams(c *gin.Context) {
 	// 获取数据
 	var t []model.Team
 	userId := c.PostForm("userId")
@@ -66,6 +66,20 @@ func GetTeam(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "msg": "没有参与小组~"})
 	}
+}
+
+func GetTeamInfo(c *gin.Context) {
+	// 获取数据
+	var t model.Team
+	teamId := c.PostForm("teamId")
+	// 查找
+	result := database.DB.Find(&t, "team_id=?", teamId)
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
+		return
+	}
+	// 返回数据
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": result})
 }
 
 func UpdateTeamInfo(c *gin.Context) {
