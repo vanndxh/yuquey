@@ -106,3 +106,23 @@ func GetUserInfo(c *gin.Context) {
 	returnJSON["likeTotal"] = user.LikeTotal
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "success", "data": returnJSON})
 }
+
+func UpdateUserInfo(c *gin.Context) {
+	// 获取数据
+	var u model.User
+	username := c.PostForm("username")
+	password := c.PostForm("password")
+	userInfo := c.PostForm("userInfo")
+	// 找到对应记录
+	result := database.DB.Find(&u, "user_id=?", 1)
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
+		return
+	}
+	// update
+	database.DB.Model(&u).Update("user_name", username)
+	database.DB.Model(&u).Update("password", password)
+	database.DB.Model(&u).Update("user_info", userInfo)
+	// 返回结果
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "success", "data": "用户个人信息修改成功！"})
+}

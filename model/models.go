@@ -20,13 +20,6 @@ type Article struct {
 	Hot            int    `gorm:"not null"`
 }
 
-type Timeline struct {
-	Title   string `gorm:"varchar(20);not null"`
-	Content string `gorm:"varchar(100);not null"`
-	Time    string `gorm:"varchar(20);not null"`
-	Type    string `gorm:"varchar(20)"`
-}
-
 type Team struct {
 	TeamId      int    `gorm:"primary_key;AUTO_INCREASE"`
 	TeamName    string `gorm:"varchar(10);not null"`
@@ -43,6 +36,13 @@ type Comment struct {
 	UserId         int    `gorm:"not null"`
 	ArticleId      int    `gorm:"not null"`
 	CommentContent string `gorm:"not null"`
+}
+
+type Timeline struct {
+	Title   string `gorm:"varchar(20);not null"`
+	Content string `gorm:"varchar(100);not null"`
+	Time    string `gorm:"varchar(20);not null"`
+	Type    string `gorm:"varchar(20)"`
 }
 
 type SupportCount struct {

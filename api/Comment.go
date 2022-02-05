@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"net/http"
 	"strconv"
 	"yuquey/database"
 	"yuquey/model"
@@ -35,5 +36,25 @@ func CreateComment(c *gin.Context) {
 	// 返回结果
 	c.JSON(200, gin.H{
 		"msg": "评论成功！",
+	})
+}
+
+func DeleteComment(c *gin.Context) {
+	// 获取数据
+	var cc model.Comment
+	articleId, err := strconv.Atoi(c.PostForm("articleId"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	// 删除操作
+	result := database.DB.Delete(&cc, "comment_id=?", articleId)
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
+		return
+	}
+	// 返回结果
+	c.JSON(200, gin.H{
+		"msg": "评论删除成功！",
 	})
 }

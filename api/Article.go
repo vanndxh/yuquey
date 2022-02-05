@@ -144,7 +144,7 @@ func UpdateArticle(c *gin.Context) {
 		return
 	}
 	// 先找到对应文章数据,即a为要update的记录
-	result := database.DB.Find(&a, "article_id=?", 100001)
+	result := database.DB.Find(&a, "article_id=?", 1)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
@@ -153,5 +153,23 @@ func UpdateArticle(c *gin.Context) {
 	database.DB.Model(&a).Update("article_name", articleName)
 	database.DB.Model(&a).Update("article_content", articleContent)
 	// 返回结果
-	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "success", "data": "文章修改成功！"})
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "文章修改成功！"})
+}
+
+func SearchArticle(c *gin.Context) {
+	// 获取数据
+	var a []model.Article
+	searchValue := c.PostForm("searchValue")
+	// 根据searchValue模糊搜索
+	result := database.DB.Find(&a, "article_name like ?", "%"+searchValue+"%")
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
+		return
+	}
+	// 返回结果
+	if result.RowsAffected != 0 {
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": result})
+	} else {
+		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "msg": "没有找到文章~"})
+	}
 }
