@@ -31,6 +31,15 @@ func AddLike(c *gin.Context) {
 		fmt.Println(err3)
 		return
 	}
+	// 给用户点赞总数++
+	var u model.User
+	result := database.DB.Find(&u, "user_id=?", userId)
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
+		return
+	}
+	likeNow := u.LikeTotal
+	database.DB.Model(&u).Update("like_total", likeNow+1)
 	// 返回结果
 	c.JSON(200, gin.H{
 		"msg": "点赞成功！",
@@ -62,6 +71,15 @@ func CancelLike(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
 	}
+	// 给用户点赞总数--
+	var u model.User
+	result3 := database.DB.Find(&u, "user_id=?", userId)
+	if result3.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
+		return
+	}
+	likeNow := u.LikeTotal
+	database.DB.Model(&u).Update("like_total", likeNow-1)
 	// 返回结果
 	c.JSON(200, gin.H{
 		"msg": "取消点赞成功！",
@@ -83,6 +101,10 @@ func JudgeIsLiked(c *gin.Context) {
 	}
 	// 寻找对应实例
 	result := database.DB.Find(&l, "user_id=? AND article_id=?", userId, articleId)
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
+		return
+	}
 	// 返回表单
 	returnJSON1 := make(map[string]interface{})
 	returnJSON1["isLiked"] = true

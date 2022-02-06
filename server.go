@@ -15,29 +15,28 @@ func main() {
 	// user
 	V1user := apiV1.Group("/user")
 	V1user.POST("/register", api.Register)
-	V1user.POST("/signIn", api.SignIn)
-	V1user.GET("/getUserInfo", api.GetUserInfo)
 	V1user.PUT("/updateUserInfo", api.UpdateUserInfo)
+	V1user.GET("/getUserInfo", api.GetUserInfo)
+	V1user.POST("/signIn", api.SignIn)
 
 	// article
 	V1article := apiV1.Group("/article")
-	V1article.GET("/getArticleInfo", api.GetArticleInfo)
 	V1article.GET("/getArticles", api.GetArticles)
+	V1article.GET("/getArticleInfo", api.GetArticleInfo)
 	V1article.POST("/createArticle", api.CreateArticle)
-	V1article.GET("/getHotArticle", api.GetHotArticle)
 	V1article.DELETE("/deleteArticle", api.DeleteArticle)
-	V1article.PUT("/transToTrash", api.TransToTrash)
-	V1article.PUT("/transOutTrash", api.TransOutTrash)
 	V1article.PUT("/updateArticle", api.UpdateArticle)
+	V1article.PUT("/transTrash", api.TransTrash)
 	V1article.GET("/searchArticle", api.SearchArticle)
+	V1article.GET("/getHotArticle", api.GetHotArticle)
 
 	// team
 	V1team := apiV1.Group("/team")
+	V1team.GET("/getTeams", api.GetTeams)
 	V1team.POST("/createTeam", api.CreateTeam)
 	V1team.DELETE("/deleteTeam", api.DeleteTeam)
-	V1team.GET("/getTeams", api.GetTeams)
-	V1team.GET("/getTeamInfo", api.GetTeamInfo)
 	V1team.PUT("/updateTeamInfo", api.UpdateTeamInfo)
+	V1team.GET("/getTeamInfo", api.GetTeamInfo)
 	V1team.PUT("/addTeamUser", api.AddTeamUser)
 
 	// comment

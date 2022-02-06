@@ -5,8 +5,8 @@ type User struct {
 	Username      string `gorm:"varchar(20);not null"`
 	Password      string `gorm:"size:255;not null"`
 	UserInfo      string `gorm:"varchar(200)"`
-	ArticleAmount int    `gorm:"int8;not null"`
-	LikeTotal     int8   `gorm:"int8;not null"`
+	ArticleAmount int    `gorm:"not null"`
+	LikeTotal     int    `gorm:"not null"`
 }
 
 type Article struct {
