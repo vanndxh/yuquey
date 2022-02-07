@@ -69,5 +69,5 @@ func main() {
 	V1feedback := apiV1.Group("/feedback")
 	V1feedback.POST("/submitFeedback", api.SubmitFeedback)
 
-	panic(r.Run("0.0.0.0:8080"))
+	panic(r.Run("0.0.0.0:8088"))
 }

@@ -1,9 +1,11 @@
 package api
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"strconv"
 	"yuquey/database"
 	"yuquey/model"
 )
@@ -58,15 +60,19 @@ func Register(c *gin.Context) {
 func SignIn(c *gin.Context) {
 	// 获取参数
 	var u model.User
-	userId := c.PostForm("userId")
+	userId, err := strconv.Atoi(c.PostForm("userId"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	password := c.PostForm("password")
 	// 查找用户是否存在并验证密码
 	result := database.DB.Find(&u, "user_id=? AND password=?", userId, password)
 	// 返回结果
 	if result.RowsAffected != 0 {
-		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "登录成功！"})
+		c.JSON(http.StatusOK, gin.H{"status": 200, "msg": "登录成功！"})
 	} else {
-		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "msg": "账号或密码错误！"})
+		c.JSON(http.StatusNotFound, gin.H{"status": 404, "msg": "账号或密码错误！"})
 	}
 }
 

@@ -11,15 +11,23 @@ import (
 
 func GetArticles(c *gin.Context) {
 	var a []model.Article
-	articleAuthor := c.PostForm("articleAuthor")
-	isInTrash := c.PostForm("isInTrash")
+	articleAuthor, err := strconv.Atoi(c.PostForm("articleAuthor"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	isInTrash, err2 := strconv.Atoi(c.PostForm("isInTrash"))
+	if err2 != nil {
+		fmt.Println(err2)
+		return
+	}
 	result := database.DB.Find(&a, "article_author=? AND is_in_trash=?", articleAuthor, isInTrash)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
 	}
 	if result.RowsAffected != 0 {
-		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": result})
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": a})
 	} else {
 		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "msg": "The articles are not exist."})
 	}
