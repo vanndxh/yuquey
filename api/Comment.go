@@ -42,13 +42,13 @@ func CreateComment(c *gin.Context) {
 func DeleteComment(c *gin.Context) {
 	// 获取数据
 	var cc model.Comment
-	articleId, err := strconv.Atoi(c.PostForm("articleId"))
+	commentId, err := strconv.Atoi(c.PostForm("commentId"))
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	// 删除操作
-	result := database.DB.Delete(&cc, "comment_id=?", articleId)
+	result := database.DB.Delete(&cc, "comment_id=?", commentId)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return

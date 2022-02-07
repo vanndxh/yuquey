@@ -38,7 +38,7 @@ func AddStar(c *gin.Context) {
 }
 
 func CancelStar(c *gin.Context) {
-	var l model.Like
+	var s model.Star
 	// 获取数据
 	userId, err := strconv.Atoi(c.PostForm("userId"))
 	if err != nil {
@@ -50,14 +50,9 @@ func CancelStar(c *gin.Context) {
 		fmt.Println(err2)
 		return
 	}
-	// 寻找对应实例
-	result := database.DB.Find(&l, "user_id=? AND article_id=?", userId, articleId)
+	// 删除对应实例
+	result := database.DB.Delete(&s, "user_id=? AND article_id=?", userId, articleId)
 	if result.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
-		return
-	}
-	result2 := database.DB.Delete(&l, "user_id=? AND article_id=?", userId, articleId)
-	if result2.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
 	}

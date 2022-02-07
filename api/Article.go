@@ -13,7 +13,7 @@ func GetArticles(c *gin.Context) {
 	var a []model.Article
 	articleAuthor := c.PostForm("articleAuthor")
 	isInTrash := c.PostForm("isInTrash")
-	result := database.DB.Find(&a, "article_author=? AND is_in-trash=?", articleAuthor, isInTrash)
+	result := database.DB.Find(&a, "article_author=? AND is_in_trash=?", articleAuthor, isInTrash)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
@@ -80,9 +80,9 @@ func CreateArticle(c *gin.Context) {
 	}
 	// 给用户文章总数++
 	var u model.User
-	result := database.DB.Find(&u, "user_id=?", articleAuthor)
+	result := database.DB.Find(&u, "user_id=?", 1)
 	if result.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": "finderr " + result.Error.Error()})
 		return
 	}
 	articleNow := u.ArticleAmount
@@ -99,7 +99,8 @@ func DeleteArticle(c *gin.Context) {
 	articleId := c.PostForm("articleId")
 	userId, err := strconv.Atoi(c.PostForm("userId"))
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println(userId)
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": err})
 		return
 	}
 	// 删除操作
@@ -150,6 +151,7 @@ func GetArticleInfo(c *gin.Context) {
 func UpdateArticle(c *gin.Context) {
 	// 获取数据
 	var a model.Article
+	articleId := c.PostForm("articleId")
 	articleName := c.PostForm("articleName")
 	articleContent := c.PostForm("articleContent")
 	// 判断合理性
@@ -168,7 +170,7 @@ func UpdateArticle(c *gin.Context) {
 		return
 	}
 	// 先找到对应文章数据,即a为要update的记录
-	result := database.DB.Find(&a, "article_id=?", 1)
+	result := database.DB.Find(&a, "article_id=?", articleId)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return

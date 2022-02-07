@@ -13,9 +13,9 @@ func init() {
 	var err error
 	host := "localhost"
 	port := 1101
-	database := "yuquey"
+	database := "postgres"
 	username := "postgres"
-	password := "vanndxh1101"
+	password := "pgsql1101"
 	psgInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, username, password, database)
 	DB, err = gorm.Open("postgres", psgInfo)
@@ -25,5 +25,5 @@ func init() {
 	}
 	// 自动建表
 	DB.AutoMigrate(&model.User{}, &model.Article{}, &model.Timeline{}, &model.SupportCount{}, &model.Like{},
-		&model.Star{}, &model.Feedback{}, &model.Team{})
+		&model.Star{}, &model.Feedback{}, &model.Team{}, &model.Comment{})
 }

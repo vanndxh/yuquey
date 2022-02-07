@@ -5,23 +5,23 @@ services:
     image: postgres:alpine  # 基础镜像
     container_name: "fund_postgres"  # 容器名称
     ports:
-      - "1101:1101"
+      - "5432:5432"
     volumes:
       - pg-data:/var/lib/postgresql/data  # 数据卷挂载
     environment:
       - POSTGRES_DB=yuquey  # 数据库名
       - POSTGRES_USER=postgres  # 数据库用户
       - POSTGRES_PASSWORD=vanndxh1101  # 数据库密码
-  go:
-    container_name: "fund_go"
-    build: .  # Dockerfile文件目录
-    restart: always
-    ports:
-      - "8080:8080"
-    links:
-      - pg
-    depends_on:
-      - pg
+#  go:
+#    container_name: "fund_go"
+#    build: .  # Dockerfile文件目录
+#    restart: always
+#    ports:
+#      - "8080:8080"
+#    links:
+#      - pg
+#    depends_on:
+#      - pg
 
 volumes: # 数据卷
   pg-data:

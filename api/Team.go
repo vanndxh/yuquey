@@ -85,10 +85,15 @@ func GetTeamInfo(c *gin.Context) {
 func UpdateTeamInfo(c *gin.Context) {
 	// 获取数据
 	var t model.Team
+	teamId, err := strconv.Atoi(c.PostForm("teamId"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	teamName := c.PostForm("teamName")
 	teamNotice := c.PostForm("teamNotice")
 	// 找到对应记录
-	result := database.DB.Find(&t, "team_id=?", 1)
+	result := database.DB.Find(&t, "team_id=?", teamId)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
@@ -103,8 +108,16 @@ func UpdateTeamInfo(c *gin.Context) {
 func AddTeamUser(c *gin.Context) {
 	// 获取数据
 	var t model.Team
-	teamId := c.PostForm("teamId")
-	newUserId := c.PostForm("newUserId")
+	teamId, err := strconv.Atoi(c.PostForm("teamId"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	newUserId, err := strconv.Atoi(c.PostForm("newUserId"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	// 找到对应记录
 	result := database.DB.Find(&t, "team_id=?", teamId)
 	if result.Error != nil {
@@ -122,7 +135,8 @@ func AddTeamUser(c *gin.Context) {
 		database.DB.Model(&t).Update("team_member4", newUserId)
 	} else {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": "小组成员已满，无法加入！"})
+		return
 	}
 	// 返回结果
-	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "小组信息修改成功！"})
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "小组成员添加成功！"})
 }

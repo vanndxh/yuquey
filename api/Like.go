@@ -101,10 +101,6 @@ func JudgeIsLiked(c *gin.Context) {
 	}
 	// 寻找对应实例
 	result := database.DB.Find(&l, "user_id=? AND article_id=?", userId, articleId)
-	if result.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
-		return
-	}
 	// 返回表单
 	returnJSON1 := make(map[string]interface{})
 	returnJSON1["isLiked"] = true
