@@ -17,7 +17,7 @@ func main() {
 	V1user.POST("/register", api.Register)
 	V1user.PUT("/updateUserInfo", api.UpdateUserInfo)
 	V1user.GET("/getUserInfo", api.GetUserInfo)
-	V1user.POST("/signIn", api.SignIn)
+	V1user.PUT("/signIn", api.SignIn)
 
 	// article
 	V1article := apiV1.Group("/article")

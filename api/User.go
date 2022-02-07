@@ -57,37 +57,17 @@ func Register(c *gin.Context) {
 
 func SignIn(c *gin.Context) {
 	// 获取参数
-	username := c.PostForm("username")
+	var u model.User
+	userId := c.PostForm("userId")
 	password := c.PostForm("password")
-
-	// 判断合理性
-	if len(password) == 0 {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"code": 422,
-			"msg":  "密码不能为空！",
-		})
-		return
-	} else if len(password) < 6 {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"code": 422,
-			"msg":  "密码不能小于6位！",
-		})
-		return
-	}
-	if len(username) == 0 {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"code": 422,
-			"msg":  "用户名不能为空！",
-		})
-		return
-	}
-
 	// 查找用户是否存在并验证密码
-
+	result := database.DB.Find(&u, "user_id=? AND password=?", userId, password)
 	// 返回结果
-	c.JSON(200, gin.H{
-		"msg": "登录成功！",
-	})
+	if result.RowsAffected != 0 {
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "登录成功！"})
+	} else {
+		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "msg": "账号或密码错误！"})
+	}
 }
 
 func GetUserInfo(c *gin.Context) {
