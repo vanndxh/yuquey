@@ -5,16 +5,27 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	"strconv"
 	"yuquey/database"
 	"yuquey/model"
 )
 
 func Register(c *gin.Context) {
 	// 获取参数
-	username := c.PostForm("username")
-	password := c.PostForm("password")
-	rePassword := c.PostForm("rePassword")
+	username, ok := c.GetPostForm("username")
+	if !ok {
+		fmt.Println(ok, username, "1")
+		return
+	}
+	password, ok2 := c.GetPostForm("password")
+	if !ok2 {
+		fmt.Println(ok2, password, "2")
+		return
+	}
+	rePassword, ok3 := c.GetPostForm("rePassword")
+	if !ok3 {
+		fmt.Println(ok3, rePassword, "3")
+		return
+	}
 	// 判断合理性
 	if len(password) == 0 {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
@@ -54,20 +65,28 @@ func Register(c *gin.Context) {
 	}
 
 	//返回结果
-	c.JSON(http.StatusOK, gin.H{"code": http.StatusOK, "msg": "注册成功！"})
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "注册成功！", "userId": newUser.UserId, "password": newUser.Password})
 }
 
-func SignIn(c *gin.Context) {
+func Login(c *gin.Context) {
 	// 获取参数
 	var u model.User
-	userId, err := strconv.Atoi(c.PostForm("userId"))
-	if err != nil {
-		fmt.Println(err)
+	userId, ok := c.GetPostForm("userId")
+	if !ok {
+		fmt.Println(ok)
 		return
 	}
-	password := c.PostForm("password")
+	password, ok2 := c.GetPostForm("password")
+	if !ok2 {
+		fmt.Println(ok2)
+		return
+	}
 	// 查找用户是否存在并验证密码
 	result := database.DB.Find(&u, "user_id=? AND password=?", userId, password)
+	if result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"status": 404, "msg": "账号或密码错误！"})
+		return
+	}
 	// 返回结果
 	if result.RowsAffected != 0 {
 		c.JSON(http.StatusOK, gin.H{"status": 200, "msg": "登录成功！"})
