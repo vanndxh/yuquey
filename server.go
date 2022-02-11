@@ -16,23 +16,23 @@ func main() {
 	V1user := apiV1.Group("/user")
 	V1user.POST("/register", api.Register)
 	V1user.PUT("/updateUserInfo", api.UpdateUserInfo)
-	V1user.GET("/getUserInfo", api.GetUserInfo)
+	V1user.POST("/getUserInfo", api.GetUserInfo)
 	V1user.POST("/login", api.Login)
 
 	// article
 	V1article := apiV1.Group("/article")
-	V1article.GET("/getArticles", api.GetArticles)
-	V1article.GET("/getArticleInfo", api.GetArticleInfo)
+	V1article.POST("/getArticles", api.GetArticles)
+	V1article.POST("/getArticleInfo", api.GetArticleInfo)
 	V1article.POST("/createArticle", api.CreateArticle)
 	V1article.DELETE("/deleteArticle", api.DeleteArticle)
 	V1article.PUT("/updateArticle", api.UpdateArticle)
-	V1article.PUT("/transTrash", api.TransTrash)
+	V1article.POST("/transTrash", api.TransTrash)
 	V1article.GET("/searchArticle", api.SearchArticle)
 	V1article.GET("/getHotArticle", api.GetHotArticle)
 
 	// team
 	V1team := apiV1.Group("/team")
-	V1team.GET("/getTeams", api.GetTeams)
+	V1team.POST("/getTeams", api.GetTeams)
 	V1team.POST("/createTeam", api.CreateTeam)
 	V1team.DELETE("/deleteTeam", api.DeleteTeam)
 	V1team.PUT("/updateTeamInfo", api.UpdateTeamInfo)
@@ -48,14 +48,14 @@ func main() {
 	V1like := apiV1.Group("/like")
 	V1like.POST("/addLike", api.AddLike)
 	V1like.DELETE("cancelLike", api.CancelLike)
-	V1like.GET("/judgeIsLiked", api.JudgeIsLiked)
+	V1like.POST("/judgeIsLiked", api.JudgeIsLiked)
 
 	// star
 	V1star := apiV1.Group("/star")
 	V1star.POST("/addStar", api.AddStar)
 	V1star.DELETE("cancelStar", api.CancelStar)
-	V1star.GET("/getFavorite", api.GetFavorite)
-	V1like.GET("/judgeIsStared", api.JudgeIsStared)
+	V1star.POST("/getFavorite", api.GetFavorite)
+	V1star.POST("/judgeIsStared", api.JudgeIsStared)
 
 	// timeline
 	V1timeline := apiV1.Group("/timeline")

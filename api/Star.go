@@ -81,7 +81,7 @@ func GetFavorite(c *gin.Context) {
 	result := database.DB.Find(&a, idSlice)
 	// 返回结果
 	if result.RowsAffected != 0 {
-		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": result})
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": a})
 	} else {
 		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "msg": "收藏夹是空的！"})
 	}
@@ -108,8 +108,8 @@ func JudgeIsStared(c *gin.Context) {
 	returnJSON2 := make(map[string]interface{})
 	returnJSON2["isStared"] = false
 	if result.RowsAffected != 0 {
-		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": returnJSON1})
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": "true"})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": returnJSON2})
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": "false"})
 	}
 }

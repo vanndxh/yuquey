@@ -107,8 +107,8 @@ func JudgeIsLiked(c *gin.Context) {
 	returnJSON2 := make(map[string]interface{})
 	returnJSON2["isLiked"] = false
 	if result.RowsAffected != 0 {
-		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": returnJSON1})
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": "true"})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": returnJSON2})
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": "false"})
 	}
 }

@@ -13,12 +13,11 @@ func GetArticles(c *gin.Context) {
 	var a []model.Article
 	articleAuthor, err := strconv.Atoi(c.PostForm("articleAuthor"))
 	if err != nil {
-		fmt.Println(err)
-		return
+		fmt.Println(err, "1")
 	}
 	isInTrash, err2 := strconv.Atoi(c.PostForm("isInTrash"))
 	if err2 != nil {
-		fmt.Println(err2)
+		fmt.Println(err2, "2")
 		return
 	}
 	result := database.DB.Find(&a, "article_author=? AND is_in_trash=?", articleAuthor, isInTrash)
@@ -26,11 +25,7 @@ func GetArticles(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
 	}
-	if result.RowsAffected != 0 {
-		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": a})
-	} else {
-		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "msg": "The articles are not exist."})
-	}
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": a})
 }
 
 func SearchArticle(c *gin.Context) {
@@ -90,14 +85,15 @@ func CreateArticle(c *gin.Context) {
 	var u model.User
 	result := database.DB.Find(&u, "user_id=?", 1)
 	if result.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": "finderr " + result.Error.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
 	}
 	articleNow := u.ArticleAmount
 	database.DB.Model(&u).Update("article_amount", articleNow+1)
 	// 返回结果
 	c.JSON(200, gin.H{
-		"msg": "文章创建成功！",
+		"msg":       "文章创建成功！",
+		"articleId": newArticle.ArticleId,
 	})
 }
 
@@ -143,14 +139,8 @@ func GetArticleInfo(c *gin.Context) {
 		return
 	}
 	// 返回表单
-	returnJSON := make(map[string]interface{})
-	returnJSON["ArticleName"] = a.ArticleName
-	returnJSON["ArticleContent"] = a.ArticleContent
-	returnJSON["LikeAmount"] = a.LikeAmount
-	returnJSON["StarAmount"] = a.StarAmount
-	returnJSON["Hot"] = a.Hot
 	if result.RowsAffected != 0 {
-		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": returnJSON})
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": a})
 	} else {
 		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "msg": "This article is not exist."})
 	}
@@ -193,8 +183,11 @@ func UpdateArticle(c *gin.Context) {
 func TransTrash(c *gin.Context) {
 	var a model.Article
 	articleId := c.PostForm("articleId")
-	handle := c.PostForm("handle")
-
+	handle, err := strconv.Atoi(c.PostForm("handle"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	result := database.DB.Find(&a, "article_id=?", articleId)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
@@ -215,9 +208,5 @@ func GetHotArticle(c *gin.Context) {
 		return
 	}
 	// 返回表单
-	if result.RowsAffected != 0 {
-		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": result})
-	} else {
-		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "msg": "库中没有文章"})
-	}
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": a})
 }

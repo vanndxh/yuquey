@@ -62,7 +62,7 @@ func GetTeams(c *gin.Context) {
 	}
 	// 返回数据
 	if result.RowsAffected != 0 {
-		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": result})
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": t})
 	} else {
 		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "msg": "没有参与小组~"})
 	}
