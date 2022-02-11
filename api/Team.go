@@ -79,7 +79,7 @@ func GetTeamInfo(c *gin.Context) {
 		return
 	}
 	// 返回数据
-	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": result})
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": t})
 }
 
 func UpdateTeamInfo(c *gin.Context) {

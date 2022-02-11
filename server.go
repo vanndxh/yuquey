@@ -24,10 +24,10 @@ func main() {
 	V1article.POST("/getArticles", api.GetArticles)
 	V1article.POST("/getArticleInfo", api.GetArticleInfo)
 	V1article.POST("/createArticle", api.CreateArticle)
-	V1article.DELETE("/deleteArticle", api.DeleteArticle)
+	V1article.POST("/deleteArticle", api.DeleteArticle)
 	V1article.PUT("/updateArticle", api.UpdateArticle)
 	V1article.POST("/transTrash", api.TransTrash)
-	V1article.GET("/searchArticle", api.SearchArticle)
+	V1article.POST("/searchArticle", api.SearchArticle)
 	V1article.GET("/getHotArticle", api.GetHotArticle)
 
 	// team
@@ -36,7 +36,7 @@ func main() {
 	V1team.POST("/createTeam", api.CreateTeam)
 	V1team.DELETE("/deleteTeam", api.DeleteTeam)
 	V1team.PUT("/updateTeamInfo", api.UpdateTeamInfo)
-	V1team.GET("/getTeamInfo", api.GetTeamInfo)
+	V1team.POST("/getTeamInfo", api.GetTeamInfo)
 	V1team.PUT("/addTeamUser", api.AddTeamUser)
 
 	// comment
