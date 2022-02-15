@@ -35,9 +35,13 @@ func main() {
 	V1team.POST("/getTeams", api.GetTeams)
 	V1team.POST("/createTeam", api.CreateTeam)
 	V1team.DELETE("/deleteTeam", api.DeleteTeam)
-	V1team.PUT("/updateTeamInfo", api.UpdateTeamInfo)
+	V1team.POST("/updateTeamInfo", api.UpdateTeamInfo)
 	V1team.POST("/getTeamInfo", api.GetTeamInfo)
 	V1team.PUT("/addTeamUser", api.AddTeamUser)
+	V1team.POST("/punch", api.Punch)
+	V1team.POST("/quitTeam", api.QuitTeam)
+	V1team.POST("/getTeamArticles", api.GetTeamArticles)
+	V1team.POST("/getTeamMembers", api.GetTeamMembers)
 
 	// comment
 	V1comment := apiV1.Group("/comment")
@@ -53,7 +57,7 @@ func main() {
 	// star
 	V1star := apiV1.Group("/star")
 	V1star.POST("/addStar", api.AddStar)
-	V1star.DELETE("cancelStar", api.CancelStar)
+	V1star.POST("cancelStar", api.CancelStar)
 	V1star.POST("/getFavorite", api.GetFavorite)
 	V1star.POST("/judgeIsStared", api.JudgeIsStared)
 

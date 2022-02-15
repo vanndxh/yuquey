@@ -36,7 +36,11 @@ func CreateTeam(c *gin.Context) {
 func DeleteTeam(c *gin.Context) {
 	// 获取小组id
 	var t model.Team
-	teamId := c.PostForm("teamId")
+	teamId, err := strconv.Atoi(c.PostForm("teamId"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	// 删除操作
 	result := database.DB.Delete(&t, "team_id=?", teamId)
 	if result.Error != nil {
@@ -113,15 +117,20 @@ func AddTeamUser(c *gin.Context) {
 		fmt.Println(err)
 		return
 	}
-	newUserId, err := strconv.Atoi(c.PostForm("newUserId"))
-	if err != nil {
-		fmt.Println(err)
+	newUserId, err2 := strconv.Atoi(c.PostForm("newUserId"))
+	if err2 != nil {
+		fmt.Println(err2)
 		return
 	}
 	// 找到对应记录
 	result := database.DB.Find(&t, "team_id=?", teamId)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
+		return
+	}
+	// 判断是否已经存在
+	if newUserId == t.TeamLeader || newUserId == t.TeamMember1 || newUserId == t.TeamMember2 || newUserId == t.TeamMember3 || newUserId == t.TeamMember4 {
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": "小组成员已经存在！"})
 		return
 	}
 	// 把新用户id放入第一个空位
@@ -139,4 +148,113 @@ func AddTeamUser(c *gin.Context) {
 	}
 	// 返回结果
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "小组成员添加成功！"})
+}
+
+func Punch(c *gin.Context) {
+	userId, err := strconv.Atoi(c.PostForm("userId"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	teamId, err2 := strconv.Atoi(c.PostForm("teamId"))
+	if err2 != nil {
+		fmt.Println(err2)
+		return
+	}
+	var t model.Team
+	res := database.DB.Find(&t, "team_id=?", teamId)
+	if res.Error != nil {
+		fmt.Println(res.Error)
+		return
+	}
+	if t.TeamLeader == userId {
+		countNow := t.LeaderCount
+		database.DB.Model(&t).Update("leader_count", countNow+1)
+	} else if t.TeamMember1 == userId {
+		countNow := t.Member1Count
+		database.DB.Model(&t).Update("member1_count", countNow+1)
+	} else if t.TeamMember2 == userId {
+		countNow := t.Member2Count
+		database.DB.Model(&t).Update("member2_count", countNow+1)
+	} else if t.TeamMember3 == userId {
+		countNow := t.Member3Count
+		database.DB.Model(&t).Update("member3_count", countNow+1)
+	} else if t.TeamMember4 == userId {
+		countNow := t.Member4Count
+		database.DB.Model(&t).Update("member4_count", countNow+1)
+	}
+}
+
+func QuitTeam(c *gin.Context) {
+	userId, err := strconv.Atoi(c.PostForm("userId"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	teamId, err2 := strconv.Atoi(c.PostForm("teamId"))
+	if err2 != nil {
+		fmt.Println(err2)
+		return
+	}
+	var t model.Team
+	res := database.DB.Find(&t, "team_id=?", teamId)
+	if res.Error != nil {
+		fmt.Println(res.Error)
+		return
+	}
+	if t.TeamLeader == userId {
+		database.DB.Model(&t).Update("team_leader", 0)
+	} else if t.TeamMember1 == userId {
+		database.DB.Model(&t).Update("team_member1", 0)
+	} else if t.TeamMember2 == userId {
+		database.DB.Model(&t).Update("team_member2", 0)
+	} else if t.TeamMember3 == userId {
+		database.DB.Model(&t).Update("team_member3", 0)
+	} else if t.TeamMember4 == userId {
+		database.DB.Model(&t).Update("team_member4", 0)
+	}
+}
+
+func GetTeamArticles(c *gin.Context) {
+	teamId, err2 := strconv.Atoi(c.PostForm("teamId"))
+	if err2 != nil {
+		fmt.Println(err2)
+		return
+	}
+	var t model.Team
+	res := database.DB.Find(&t, "team_id=?", teamId)
+	if res.Error != nil {
+		fmt.Println(res.Error)
+		return
+	}
+	var a []model.Article
+	res2 := database.DB.Find(&a, "article_author=? OR article_author=? OR article_author=? OR article_author=? OR article_author=?",
+		t.TeamLeader, t.TeamMember1, t.TeamMember2, t.TeamMember3, t.TeamMember4)
+	if res2.Error != nil {
+		fmt.Println(res2.Error)
+		return
+	}
+	c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "data": a})
+}
+
+func GetTeamMembers(c *gin.Context) {
+	teamId, err2 := strconv.Atoi(c.PostForm("teamId"))
+	if err2 != nil {
+		fmt.Println(err2)
+		return
+	}
+	var t model.Team
+	res := database.DB.Find(&t, "team_id=?", teamId)
+	if res.Error != nil {
+		fmt.Println(res.Error)
+		return
+	}
+	var u []model.User
+	res2 := database.DB.Find(&u, "user_id=? OR user_id=? OR user_id=? OR user_id=? OR user_id=?",
+		t.TeamLeader, t.TeamMember1, t.TeamMember2, t.TeamMember3, t.TeamMember4)
+	if res2.Error != nil {
+		fmt.Println(res2.Error)
+		return
+	}
+	c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "data": u})
 }
