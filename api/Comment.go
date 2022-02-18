@@ -10,7 +10,6 @@ import (
 )
 
 func CreateComment(c *gin.Context) {
-	// 获取数据
 	userId, err := strconv.Atoi(c.PostForm("userId"))
 	if err != nil {
 		fmt.Println(err)
@@ -22,9 +21,13 @@ func CreateComment(c *gin.Context) {
 		return
 	}
 	commentContent := c.PostForm("commentContent")
-	// 创建新实例
+
+	var u model.User
+	database.DB.Find(&u, "user_id=?", userId)
+
 	newComment := model.Comment{
 		UserId:         userId,
+		UserName:       u.Username,
 		ArticleId:      articleId,
 		CommentContent: commentContent,
 	}
@@ -33,7 +36,7 @@ func CreateComment(c *gin.Context) {
 		fmt.Println(err3)
 		return
 	}
-	// 返回结果
+
 	c.JSON(200, gin.H{
 		"msg": "评论成功！",
 	})
@@ -57,4 +60,30 @@ func DeleteComment(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"msg": "评论删除成功！",
 	})
+}
+
+func GetArticleComment(c *gin.Context) {
+	articleId := c.DefaultQuery("articleId", "")
+
+	var cc []model.Comment
+	res := database.DB.Find(&cc, "article_id=?", articleId)
+	if res.Error != nil {
+		fmt.Println(res.Error)
+		return
+	}
+
+	c.JSON(200, gin.H{"status": 200, "data": cc})
+}
+
+func GetUserComment(c *gin.Context) {
+	userId := c.DefaultQuery("userId", "")
+
+	var cc []model.Comment
+	res := database.DB.Find(&cc, "user_id=?", userId)
+	if res.Error != nil {
+		fmt.Println(res.Error)
+		return
+	}
+
+	c.JSON(200, gin.H{"status": 200, "data": cc})
 }

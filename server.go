@@ -47,6 +47,8 @@ func main() {
 	V1comment := apiV1.Group("/comment")
 	V1comment.POST("/createComment", api.CreateComment)
 	V1comment.DELETE("/deleteComment", api.DeleteComment)
+	V1comment.GET("/getArticleComment", api.GetArticleComment)
+	V1comment.GET("/getUserComment", api.GetUserComment)
 
 	// like
 	V1like := apiV1.Group("/like")

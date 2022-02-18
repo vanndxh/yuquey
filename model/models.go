@@ -39,6 +39,7 @@ type Team struct {
 type Comment struct {
 	CommentId      int    `gorm:"primary_key;AUTO_INCREASE"`
 	UserId         int    `gorm:"not null"`
+	UserName       string `gorm:"not null"`
 	ArticleId      int    `gorm:"not null"`
 	CommentContent string `gorm:"not null"`
 }
