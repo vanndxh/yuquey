@@ -63,23 +63,22 @@ func CancelStar(c *gin.Context) {
 }
 
 func GetFavorite(c *gin.Context) {
-	// 获取数据
+	userId := c.DefaultQuery("userId", "")
+
 	var s []model.Star
-	var a []model.Article
-	userId := c.PostForm("userId")
-	// 先取articleId
 	subQuery := database.DB.Select("article_id").Where("user_id=?", userId).Find(&s)
 	if subQuery.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": subQuery.Error.Error()})
 		return
 	}
-	// id切片存入[]int
+
 	idSlice := make([]int, len(s))
 	for i := range s {
 		idSlice[i] = s[i].ArticleId
 	}
+	var a []model.Article
 	result := database.DB.Find(&a, idSlice)
-	// 返回结果
+
 	if result.RowsAffected != 0 {
 		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": a})
 	} else {
@@ -87,22 +86,13 @@ func GetFavorite(c *gin.Context) {
 	}
 }
 
-func JudgeIsStared(c *gin.Context) {
+func GetIsStared(c *gin.Context) {
+	userId := c.DefaultQuery("userId", "")
+	articleId := c.DefaultQuery("articleId", "")
+
 	var s model.Star
-	// 获取数据
-	userId, err := strconv.Atoi(c.PostForm("userId"))
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	articleId, err2 := strconv.Atoi(c.PostForm("articleId"))
-	if err2 != nil {
-		fmt.Println(err2)
-		return
-	}
-	// 寻找对应实例
 	result := database.DB.Find(&s, "user_id=? AND article_id=?", userId, articleId)
-	// 返回表单
+
 	returnJSON1 := make(map[string]interface{})
 	returnJSON1["isStared"] = true
 	returnJSON2 := make(map[string]interface{})

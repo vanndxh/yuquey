@@ -11,15 +11,8 @@ import (
 
 func GetArticles(c *gin.Context) {
 	var a []model.Article
-	articleAuthor, err := strconv.Atoi(c.PostForm("articleAuthor"))
-	if err != nil {
-		fmt.Println(err, "1")
-	}
-	isInTrash, err2 := strconv.Atoi(c.PostForm("isInTrash"))
-	if err2 != nil {
-		fmt.Println(err2, "2")
-		return
-	}
+	articleAuthor := c.DefaultQuery("articleAuthor", "")
+	isInTrash := c.DefaultQuery("isInTrash", "")
 	result := database.DB.Find(&a, "article_author=? AND is_in_trash=?", articleAuthor, isInTrash)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
@@ -29,16 +22,15 @@ func GetArticles(c *gin.Context) {
 }
 
 func SearchArticle(c *gin.Context) {
-	// 获取数据
+	searchValue := c.DefaultQuery("searchValue", "")
+
 	var a []model.Article
-	searchValue := c.PostForm("searchValue")
-	// 根据searchValue模糊搜索
 	result := database.DB.Find(&a, "article_name like ?", "%"+searchValue+"%")
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
 	}
-	// 返回结果
+
 	if result.RowsAffected != 0 {
 		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": a})
 	} else {
@@ -100,13 +92,8 @@ func CreateArticle(c *gin.Context) {
 func DeleteArticle(c *gin.Context) {
 	// 获取文章id
 	var a model.Article
-	articleId := c.PostForm("articleId")
-	userId, err := strconv.Atoi(c.PostForm("userId"))
-	if err != nil {
-		fmt.Println(userId)
-		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": err})
-		return
-	}
+	articleId := c.DefaultQuery("articleId", "")
+	userId := c.DefaultQuery("userId", "")
 	// 删除操作
 	result := database.DB.Delete(&a, "article_id=?", articleId)
 	if result.Error != nil {
@@ -131,7 +118,7 @@ func DeleteArticle(c *gin.Context) {
 func GetArticleInfo(c *gin.Context) {
 	// 获取数据
 	var a model.Article
-	articleId := c.PostForm("articleId")
+	articleId := c.DefaultQuery("articleId", "")
 	// 查找对应文章
 	result := database.DB.Find(&a, "article_id=?", articleId)
 	if result.Error != nil {

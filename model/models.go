@@ -50,10 +50,6 @@ type Timeline struct {
 	Type    string `gorm:"varchar(20)"`
 }
 
-type SupportCount struct {
-	Count int `gorm:"not null"`
-}
-
 type Like struct {
 	UserId    int `gorm:"not null"`
 	ArticleId int `gorm:"not null"`
@@ -62,6 +58,10 @@ type Like struct {
 type Star struct {
 	UserId    int `gorm:"not null"`
 	ArticleId int `gorm:"not null"`
+}
+
+type SupportCount struct {
+	Count int `gorm:"not null"`
 }
 
 type Feedback struct {

@@ -86,7 +86,7 @@ func CancelLike(c *gin.Context) {
 	})
 }
 
-func JudgeIsLiked(c *gin.Context) {
+func GetIsLiked(c *gin.Context) {
 	var l model.Like
 	// 获取数据
 	userId, err := strconv.Atoi(c.PostForm("userId"))

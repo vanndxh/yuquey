@@ -54,17 +54,16 @@ func DeleteTeam(c *gin.Context) {
 }
 
 func GetTeams(c *gin.Context) {
-	// 获取数据
+	userId := c.DefaultQuery("userId", "")
+
 	var t []model.Team
-	userId := c.PostForm("userId")
-	// 查找所有参与的小组
 	result := database.DB.Find(&t, "team_leader=? OR team_member1=? OR team_member2=? OR team_member3=? OR team_member4=?",
 		userId, userId, userId, userId, userId)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
 	}
-	// 返回数据
+
 	if result.RowsAffected != 0 {
 		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": t})
 	} else {
@@ -73,16 +72,15 @@ func GetTeams(c *gin.Context) {
 }
 
 func GetTeamInfo(c *gin.Context) {
-	// 获取数据
+	teamId := c.DefaultQuery("teamId", "")
+
 	var t model.Team
-	teamId := c.PostForm("teamId")
-	// 查找
 	result := database.DB.Find(&t, "team_id=?", teamId)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
 	}
-	// 返回数据
+
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": t})
 }
 
@@ -216,11 +214,7 @@ func QuitTeam(c *gin.Context) {
 }
 
 func GetTeamArticles(c *gin.Context) {
-	teamId, err2 := strconv.Atoi(c.PostForm("teamId"))
-	if err2 != nil {
-		fmt.Println(err2)
-		return
-	}
+	teamId := c.DefaultQuery("teamId", "")
 	var t model.Team
 	res := database.DB.Find(&t, "team_id=?", teamId)
 	if res.Error != nil {
@@ -238,11 +232,7 @@ func GetTeamArticles(c *gin.Context) {
 }
 
 func GetTeamMembers(c *gin.Context) {
-	teamId, err2 := strconv.Atoi(c.PostForm("teamId"))
-	if err2 != nil {
-		fmt.Println(err2)
-		return
-	}
+	teamId := c.DefaultQuery("teamId", "")
 	var t model.Team
 	res := database.DB.Find(&t, "team_id=?", teamId)
 	if res.Error != nil {

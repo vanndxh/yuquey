@@ -96,20 +96,12 @@ func Login(c *gin.Context) {
 }
 
 func GetUserInfo(c *gin.Context) {
-	// 获取登录信息
+	userId := c.DefaultQuery("userId", "")
+
 	var user model.User
-	userId := c.PostForm("userId")
-	// 查找用户
 	database.DB.Find(&user, "user_id=?", userId)
-	// 返回表单
-	returnJSON := make(map[string]interface{})
-	returnJSON["userId"] = user.UserId
-	returnJSON["username"] = user.Username
-	returnJSON["password"] = user.Password
-	returnJSON["userInfo"] = user.UserInfo
-	returnJSON["articleAmount"] = user.ArticleAmount
-	returnJSON["likeTotal"] = user.LikeTotal
-	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "success", "data": returnJSON})
+
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "success", "data": user})
 }
 
 func UpdateUserInfo(c *gin.Context) {
