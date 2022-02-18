@@ -125,9 +125,15 @@ func GetArticleInfo(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
 	}
+	var u model.User
+	res := database.DB.Find(&u, "user_id=?", a.ArticleAuthor)
+	if res.Error != nil {
+		fmt.Println(res.Error)
+		return
+	}
 	// 返回表单
 	if result.RowsAffected != 0 {
-		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": a})
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": a, "authorName": u.Username})
 	} else {
 		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "msg": "This article is not exist."})
 	}

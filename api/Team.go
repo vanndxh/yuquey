@@ -201,7 +201,7 @@ func QuitTeam(c *gin.Context) {
 		return
 	}
 	if t.TeamLeader == userId {
-		database.DB.Model(&t).Update("team_leader", 0)
+		database.DB.Delete(&t)
 	} else if t.TeamMember1 == userId {
 		database.DB.Model(&t).Update("team_member1", 0)
 	} else if t.TeamMember2 == userId {
@@ -215,6 +215,7 @@ func QuitTeam(c *gin.Context) {
 
 func GetTeamArticles(c *gin.Context) {
 	teamId := c.DefaultQuery("teamId", "")
+
 	var t model.Team
 	res := database.DB.Find(&t, "team_id=?", teamId)
 	if res.Error != nil {
@@ -228,7 +229,7 @@ func GetTeamArticles(c *gin.Context) {
 		fmt.Println(res2.Error)
 		return
 	}
-	c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "data": a})
+	c.JSON(200, gin.H{"status": 200, "data": a})
 }
 
 func GetTeamMembers(c *gin.Context) {
@@ -246,5 +247,5 @@ func GetTeamMembers(c *gin.Context) {
 		fmt.Println(res2.Error)
 		return
 	}
-	c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "data": u})
+	c.JSON(200, gin.H{"status": 200, "data": u})
 }

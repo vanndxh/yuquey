@@ -40,6 +40,15 @@ func AddLike(c *gin.Context) {
 	}
 	likeNow := u.LikeTotal
 	database.DB.Model(&u).Update("like_total", likeNow+1)
+	// 给文章点赞数++
+	var a model.Article
+	res := database.DB.Find(&a, "article_id=?", articleId)
+	if res.Error != nil {
+		fmt.Println(res.Error)
+		return
+	}
+	likeNow2 := a.LikeAmount
+	database.DB.Model(&a).Update("like_amount", likeNow2+1)
 	// 返回结果
 	c.JSON(200, gin.H{
 		"msg": "点赞成功！",
@@ -80,6 +89,15 @@ func CancelLike(c *gin.Context) {
 	}
 	likeNow := u.LikeTotal
 	database.DB.Model(&u).Update("like_total", likeNow-1)
+	// 给文章点赞数--
+	var a model.Article
+	res := database.DB.Find(&a, "article_id=?", articleId)
+	if res.Error != nil {
+		fmt.Println(res.Error)
+		return
+	}
+	likeNow2 := a.LikeAmount
+	database.DB.Model(&a).Update("like_amount", likeNow2-1)
 	// 返回结果
 	c.JSON(200, gin.H{
 		"msg": "取消点赞成功！",
@@ -87,25 +105,17 @@ func CancelLike(c *gin.Context) {
 }
 
 func GetIsLiked(c *gin.Context) {
+	userId := c.DefaultQuery("userId", "")
+	articleId := c.DefaultQuery("articleId", "")
+	fmt.Println(userId, "test")
+
 	var l model.Like
-	// 获取数据
-	userId, err := strconv.Atoi(c.PostForm("userId"))
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	articleId, err2 := strconv.Atoi(c.PostForm("articleId"))
-	if err2 != nil {
-		fmt.Println(err2)
-		return
-	}
-	// 寻找对应实例
 	result := database.DB.Find(&l, "user_id=? AND article_id=?", userId, articleId)
-	// 返回表单
-	returnJSON1 := make(map[string]interface{})
-	returnJSON1["isLiked"] = true
-	returnJSON2 := make(map[string]interface{})
-	returnJSON2["isLiked"] = false
+	if result.Error != nil {
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": "false", "msg": "no like"})
+		return
+	}
+
 	if result.RowsAffected != 0 {
 		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": "true"})
 	} else {

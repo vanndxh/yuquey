@@ -31,6 +31,15 @@ func AddStar(c *gin.Context) {
 		fmt.Println(err3)
 		return
 	}
+	// 文章收藏数++
+	var a model.Article
+	res := database.DB.Find(&a, "article_id=?", articleId)
+	if res.Error != nil {
+		fmt.Println(res.Error)
+		return
+	}
+	starNow := a.StarAmount
+	database.DB.Model(&a).Update("like_amount", starNow+1)
 	// 返回结果
 	c.JSON(200, gin.H{
 		"msg": "收藏成功！",
@@ -56,6 +65,15 @@ func CancelStar(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
 	}
+	// 文章收藏数--
+	var a model.Article
+	res := database.DB.Find(&a, "article_id=?", articleId)
+	if res.Error != nil {
+		fmt.Println(res.Error)
+		return
+	}
+	starNow := a.StarAmount
+	database.DB.Model(&a).Update("star_amount", starNow-1)
 	// 返回结果
 	c.JSON(200, gin.H{
 		"msg": "取消收藏成功！",
@@ -92,11 +110,11 @@ func GetIsStared(c *gin.Context) {
 
 	var s model.Star
 	result := database.DB.Find(&s, "user_id=? AND article_id=?", userId, articleId)
+	if result.Error != nil {
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": "false"})
+		return
+	}
 
-	returnJSON1 := make(map[string]interface{})
-	returnJSON1["isStared"] = true
-	returnJSON2 := make(map[string]interface{})
-	returnJSON2["isStared"] = false
 	if result.RowsAffected != 0 {
 		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": "true"})
 	} else {

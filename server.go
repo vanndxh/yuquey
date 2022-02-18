@@ -3,9 +3,14 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"yuquey/api"
+	"yuquey/database"
+	"yuquey/model"
 )
 
 func main() {
+	database.DB.AutoMigrate(&model.User{}, &model.Article{}, &model.Timeline{}, &model.SupportCount{}, &model.Like{},
+		&model.Star{}, &model.Feedback{}, &model.Team{}, &model.Comment{})
+
 	r := gin.Default()
 
 	//apiV1
@@ -59,7 +64,7 @@ func main() {
 	// star
 	V1star := apiV1.Group("/star")
 	V1star.POST("/addStar", api.AddStar)
-	V1star.POST("cancelStar", api.CancelStar)
+	V1star.POST("/cancelStar", api.CancelStar)
 	V1star.GET("/getFavorite", api.GetFavorite)
 	V1star.GET("/getIsStared", api.GetIsStared)
 
