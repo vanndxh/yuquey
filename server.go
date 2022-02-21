@@ -9,7 +9,7 @@ import (
 
 func main() {
 	database.DB.AutoMigrate(&model.User{}, &model.Article{}, &model.Timeline{}, &model.SupportCount{}, &model.Like{},
-		&model.Star{}, &model.Feedback{}, &model.Team{}, &model.Comment{})
+		&model.Star{}, &model.Feedback{}, &model.Team{}, &model.Comment{}, &model.Follow{})
 
 	r := gin.Default()
 
@@ -71,6 +71,11 @@ func main() {
 	// timeline
 	V1timeline := apiV1.Group("/timeline")
 	V1timeline.GET("/getTimeline", api.GetTimeline)
+
+	// follow
+	V1follow := apiV1.Group("/follow")
+	V1follow.POST("/addFollow", api.AddFollow)
+	V1follow.POST("/unFollow", api.UnFollow)
 
 	// supportCount
 	V1supportCount := apiV1.Group("/supportCount")

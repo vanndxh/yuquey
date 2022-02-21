@@ -39,7 +39,10 @@ func AddStar(c *gin.Context) {
 		return
 	}
 	starNow := a.StarAmount
-	database.DB.Model(&a).Update("like_amount", starNow+1)
+	database.DB.Model(&a).Update("star_amount", starNow+1)
+	// 给文章热度+3
+	hotNow := a.Hot
+	database.DB.Model(&a).Update("hot", hotNow+3)
 	// 返回结果
 	c.JSON(200, gin.H{
 		"msg": "收藏成功！",
@@ -74,6 +77,9 @@ func CancelStar(c *gin.Context) {
 	}
 	starNow := a.StarAmount
 	database.DB.Model(&a).Update("star_amount", starNow-1)
+	// 给文章热度-3
+	hotNow := a.Hot
+	database.DB.Model(&a).Update("hot", hotNow-3)
 	// 返回结果
 	c.JSON(200, gin.H{
 		"msg": "取消收藏成功！",

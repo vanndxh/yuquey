@@ -49,6 +49,9 @@ func AddLike(c *gin.Context) {
 	}
 	likeNow2 := a.LikeAmount
 	database.DB.Model(&a).Update("like_amount", likeNow2+1)
+	// 给文章热度+1
+	hotNow := a.Hot
+	database.DB.Model(&a).Update("hot", hotNow+1)
 	// 返回结果
 	c.JSON(200, gin.H{
 		"msg": "点赞成功！",
@@ -98,6 +101,9 @@ func CancelLike(c *gin.Context) {
 	}
 	likeNow2 := a.LikeAmount
 	database.DB.Model(&a).Update("like_amount", likeNow2-1)
+	// 给文章热度-1
+	hotNow := a.Hot
+	database.DB.Model(&a).Update("hot", hotNow-1)
 	// 返回结果
 	c.JSON(200, gin.H{
 		"msg": "取消点赞成功！",

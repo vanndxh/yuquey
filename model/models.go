@@ -1,12 +1,14 @@
 package model
 
 type User struct {
-	UserId        int    `gorm:"primary_key;AUTO_INCREASE"`
-	Username      string `gorm:"varchar(20);not null"`
-	Password      string `gorm:"size:255;not null"`
-	UserInfo      string `gorm:"varchar(200)"`
-	ArticleAmount int    `gorm:"not null"`
-	LikeTotal     int    `gorm:"not null"`
+	UserId         int    `gorm:"primary_key;AUTO_INCREASE"`
+	Username       string `gorm:"varchar(20);not null"`
+	Password       string `gorm:"size:255;not null"`
+	UserInfo       string `gorm:"varchar(200)"`
+	ArticleAmount  int    `gorm:"not null"`
+	LikeTotal      int    `gorm:"not null"`
+	FollowAmount   int    `gorm:"not null"`
+	FollowerAmount int    `gorm:"not null"`
 }
 
 type Article struct {
@@ -49,6 +51,11 @@ type Timeline struct {
 	Content string `gorm:"varchar(100);not null"`
 	Time    string `gorm:"varchar(20);not null"`
 	Type    string `gorm:"varchar(20)"`
+}
+
+type Follow struct {
+	Up       int `gorm:"not null"`
+	Follower int `gorm:"not null"`
 }
 
 type Like struct {

@@ -25,5 +25,5 @@ func init() {
 	}
 	// 自动建表
 	DB.AutoMigrate(&model.User{}, &model.Article{}, &model.Timeline{}, &model.SupportCount{}, &model.Like{},
-		&model.Star{}, &model.Feedback{}, &model.Team{}, &model.Comment{})
+		&model.Star{}, &model.Feedback{}, &model.Team{}, &model.Comment{}, &model.Follow{})
 }
