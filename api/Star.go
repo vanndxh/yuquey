@@ -9,7 +9,7 @@ import (
 	"yuquey/model"
 )
 
-func AddStar(c *gin.Context) {
+func HandleStar(c *gin.Context) {
 	// 获取数据
 	userId, err := strconv.Atoi(c.PostForm("userId"))
 	if err != nil {
@@ -21,54 +21,33 @@ func AddStar(c *gin.Context) {
 		fmt.Println(err2)
 		return
 	}
-	// 创建新实例
-	newStar := model.Star{
-		UserId:    userId,
-		ArticleId: articleId,
-	}
-	err3 := database.DB.Create(&newStar).Error
+	handle, err3 := strconv.Atoi(c.PostForm("handle"))
 	if err3 != nil {
 		fmt.Println(err3)
 		return
 	}
-	// 文章收藏数++
-	var a model.Article
-	res := database.DB.Find(&a, "article_id=?", articleId)
-	if res.Error != nil {
-		fmt.Println(res.Error)
-		return
+	if handle == 0 {
+		// 创建新实例
+		newStar := model.Star{
+			UserId:    userId,
+			ArticleId: articleId,
+		}
+		err4 := database.DB.Create(&newStar).Error
+		if err4 != nil {
+			fmt.Println(err4)
+			return
+		}
+	} else {
+		var s model.Star
+		// 删除对应实例
+		result := database.DB.Delete(&s, "user_id=? AND article_id=?", userId, articleId)
+		if result.Error != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
+			return
+		}
 	}
-	starNow := a.StarAmount
-	database.DB.Model(&a).Update("star_amount", starNow+1)
-	// 给文章热度+3
-	hotNow := a.Hot
-	database.DB.Model(&a).Update("hot", hotNow+3)
-	// 返回结果
-	c.JSON(200, gin.H{
-		"msg": "收藏成功！",
-	})
-}
 
-func CancelStar(c *gin.Context) {
-	var s model.Star
-	// 获取数据
-	userId, err := strconv.Atoi(c.PostForm("userId"))
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	articleId, err2 := strconv.Atoi(c.PostForm("articleId"))
-	if err2 != nil {
-		fmt.Println(err2)
-		return
-	}
-	// 删除对应实例
-	result := database.DB.Delete(&s, "user_id=? AND article_id=?", userId, articleId)
-	if result.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
-		return
-	}
-	// 文章收藏数--
+	// 文章收藏数
 	var a model.Article
 	res := database.DB.Find(&a, "article_id=?", articleId)
 	if res.Error != nil {
@@ -76,13 +55,23 @@ func CancelStar(c *gin.Context) {
 		return
 	}
 	starNow := a.StarAmount
-	database.DB.Model(&a).Update("star_amount", starNow-1)
-	// 给文章热度-3
+	if handle == 0 {
+		database.DB.Model(&a).Update("star_amount", starNow+1)
+	} else {
+		database.DB.Model(&a).Update("star_amount", starNow-1)
+	}
+
+	// 给文章热度
 	hotNow := a.Hot
-	database.DB.Model(&a).Update("hot", hotNow-3)
+	if handle == 0 {
+		database.DB.Model(&a).Update("hot", hotNow+3)
+	} else {
+		database.DB.Model(&a).Update("hot", hotNow-3)
+	}
+
 	// 返回结果
 	c.JSON(200, gin.H{
-		"msg": "取消收藏成功！",
+		"msg": "成功！",
 	})
 }
 
@@ -122,8 +111,8 @@ func GetIsStared(c *gin.Context) {
 	}
 
 	if result.RowsAffected != 0 {
-		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": "true"})
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": true})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": "false"})
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": false})
 	}
 }

@@ -57,14 +57,12 @@ func main() {
 
 	// like
 	V1like := apiV1.Group("/like")
-	V1like.POST("/addLike", api.AddLike)
-	V1like.DELETE("cancelLike", api.CancelLike)
+	V1like.POST("/handleLike", api.HandleLike)
 	V1like.GET("/getIsLiked", api.GetIsLiked)
 
 	// star
 	V1star := apiV1.Group("/star")
-	V1star.POST("/addStar", api.AddStar)
-	V1star.POST("/cancelStar", api.CancelStar)
+	V1star.POST("/handleStar", api.HandleStar)
 	V1star.GET("/getFavorite", api.GetFavorite)
 	V1star.GET("/getIsStared", api.GetIsStared)
 
