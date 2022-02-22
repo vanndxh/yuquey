@@ -100,7 +100,7 @@ func GetIsLiked(c *gin.Context) {
 	var l model.Like
 	result := database.DB.Find(&l, "user_id=? AND article_id=?", userId, articleId)
 	if result.Error != nil {
-		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": "false", "msg": "no like"})
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": false, "msg": "no like"})
 		return
 	}
 

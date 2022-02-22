@@ -106,7 +106,7 @@ func GetIsStared(c *gin.Context) {
 	var s model.Star
 	result := database.DB.Find(&s, "user_id=? AND article_id=?", userId, articleId)
 	if result.Error != nil {
-		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": "false"})
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": false})
 		return
 	}
 
