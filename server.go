@@ -9,7 +9,7 @@ import (
 
 func main() {
 	database.DB.AutoMigrate(&model.User{}, &model.Article{}, &model.Timeline{}, &model.SupportCount{}, &model.Like{},
-		&model.Star{}, &model.Feedback{}, &model.Team{}, &model.Comment{}, &model.Follow{})
+		&model.Collection{}, &model.Feedback{}, &model.Team{}, &model.Comment{}, &model.Follow{}, &model.Message{})
 
 	r := gin.Default()
 
@@ -60,11 +60,18 @@ func main() {
 	V1like.POST("/handleLike", api.HandleLike)
 	V1like.GET("/getIsLiked", api.GetIsLiked)
 
-	// star
-	V1star := apiV1.Group("/star")
-	V1star.POST("/handleStar", api.HandleStar)
+	// collection
+	V1star := apiV1.Group("/collection")
+	V1star.POST("/handleCollection", api.HandleCollection)
 	V1star.GET("/getFavorite", api.GetFavorite)
-	V1star.GET("/getIsStared", api.GetIsStared)
+	V1star.GET("/getIsCollected", api.GetIsCollected)
+
+	// message
+	V1message := apiV1.Group("/message")
+	V1message.GET("/getMessages", api.GetMessages)
+	V1message.POST("/readMessage", api.ReadMessage)
+	V1message.POST("/readAllMessages", api.ReadAllMessages)
+	V1message.GET("/getRead", api.GetRead)
 
 	// timeline
 	V1timeline := apiV1.Group("/timeline")

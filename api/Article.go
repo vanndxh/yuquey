@@ -25,7 +25,7 @@ func SearchArticle(c *gin.Context) {
 	searchValue := c.DefaultQuery("searchValue", "")
 
 	var a []model.Article
-	result := database.DB.Find(&a, "article_name like ?", "%"+searchValue+"%")
+	result := database.DB.Order("hot desc").Find(&a, "article_name like ?", "%"+searchValue+"%")
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return

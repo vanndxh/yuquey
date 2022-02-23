@@ -5,11 +5,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"time"
 	"yuquey/database"
 	"yuquey/model"
 )
 
-func HandleStar(c *gin.Context) {
+func HandleCollection(c *gin.Context) {
 	// 获取数据
 	userId, err := strconv.Atoi(c.PostForm("userId"))
 	if err != nil {
@@ -28,7 +29,7 @@ func HandleStar(c *gin.Context) {
 	}
 	if handle == 0 {
 		// 创建新实例
-		newStar := model.Star{
+		newStar := model.Collection{
 			UserId:    userId,
 			ArticleId: articleId,
 		}
@@ -38,7 +39,7 @@ func HandleStar(c *gin.Context) {
 			return
 		}
 	} else {
-		var s model.Star
+		var s model.Collection
 		// 删除对应实例
 		result := database.DB.Delete(&s, "user_id=? AND article_id=?", userId, articleId)
 		if result.Error != nil {
@@ -54,7 +55,7 @@ func HandleStar(c *gin.Context) {
 		fmt.Println(res.Error)
 		return
 	}
-	starNow := a.StarAmount
+	starNow := a.CollectionAmount
 	if handle == 0 {
 		database.DB.Model(&a).Update("star_amount", starNow+1)
 	} else {
@@ -69,6 +70,22 @@ func HandleStar(c *gin.Context) {
 		database.DB.Model(&a).Update("hot", hotNow-3)
 	}
 
+	// 如果是收藏，发消息给作者
+	if handle == 0 && a.ArticleAuthor != userId {
+		newMessage := model.Message{
+			UserId:    a.ArticleAuthor,
+			Type:      1,
+			Op:        userId,
+			ArticleId: articleId,
+			Time:      time.Now(),
+		}
+		err5 := database.DB.Create(&newMessage).Error
+		if err5 != nil {
+			fmt.Println(err5)
+			return
+		}
+	}
+
 	// 返回结果
 	c.JSON(200, gin.H{
 		"msg": "成功！",
@@ -78,7 +95,7 @@ func HandleStar(c *gin.Context) {
 func GetFavorite(c *gin.Context) {
 	userId := c.DefaultQuery("userId", "")
 
-	var s []model.Star
+	var s []model.Collection
 	subQuery := database.DB.Select("article_id").Where("user_id=?", userId).Find(&s)
 	if subQuery.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": subQuery.Error.Error()})
@@ -99,11 +116,11 @@ func GetFavorite(c *gin.Context) {
 	}
 }
 
-func GetIsStared(c *gin.Context) {
+func GetIsCollected(c *gin.Context) {
 	userId := c.DefaultQuery("userId", "")
 	articleId := c.DefaultQuery("articleId", "")
 
-	var s model.Star
+	var s model.Collection
 	result := database.DB.Find(&s, "user_id=? AND article_id=?", userId, articleId)
 	if result.Error != nil {
 		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": false})

@@ -1,5 +1,7 @@
 package model
 
+import "time"
+
 type User struct {
 	UserId         int    `gorm:"primary_key;AUTO_INCREASE"`
 	Username       string `gorm:"varchar(20);not null"`
@@ -12,14 +14,14 @@ type User struct {
 }
 
 type Article struct {
-	ArticleId      int    `gorm:"primary_key;AUTO_INCREASE"`
-	ArticleName    string `gorm:"varchar(20);not null"`
-	ArticleContent string `gorm:"varchar(200)"`
-	ArticleAuthor  int    `gorm:"not null"`
-	LikeAmount     int    `gorm:"not null"`
-	StarAmount     int    `gorm:"not null"`
-	IsInTrash      int    `gorm:"not null"`
-	Hot            int    `gorm:"not null"`
+	ArticleId        int    `gorm:"primary_key;AUTO_INCREASE"`
+	ArticleName      string `gorm:"varchar(20);not null"`
+	ArticleContent   string `gorm:"varchar(200)"`
+	ArticleAuthor    int    `gorm:"not null"`
+	LikeAmount       int    `gorm:"not null"`
+	CollectionAmount int    `gorm:"not null"`
+	IsInTrash        int    `gorm:"not null"`
+	Hot              int    `gorm:"not null"`
 }
 
 type Team struct {
@@ -41,9 +43,18 @@ type Team struct {
 type Comment struct {
 	CommentId      int    `gorm:"primary_key;AUTO_INCREASE"`
 	UserId         int    `gorm:"not null"`
-	UserName       string `gorm:"not null"`
 	ArticleId      int    `gorm:"not null"`
 	CommentContent string `gorm:"not null"`
+}
+
+type Message struct {
+	MessageId int       `gorm:"primary_key;AUTO_INCREASE"`
+	UserId    int       `gorm:"not null"`
+	Type      int       `gorm:"not null"`
+	Op        int       `gorm:"not null"`
+	ArticleId int       `gorm:""`
+	Read      int       `gorm:"not null"`
+	Time      time.Time `gorm:"not null"`
 }
 
 type Timeline struct {
@@ -63,7 +74,7 @@ type Like struct {
 	ArticleId int `gorm:"not null"`
 }
 
-type Star struct {
+type Collection struct {
 	UserId    int `gorm:"not null"`
 	ArticleId int `gorm:"not null"`
 }

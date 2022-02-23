@@ -27,7 +27,6 @@ func CreateComment(c *gin.Context) {
 
 	newComment := model.Comment{
 		UserId:         userId,
-		UserName:       u.Username,
 		ArticleId:      articleId,
 		CommentContent: commentContent,
 	}
@@ -71,6 +70,15 @@ func GetArticleComment(c *gin.Context) {
 		fmt.Println(res.Error)
 		return
 	}
+
+	//var i model.Comment
+	//for i = range cc {
+	//	uid := i.UserId
+	//	var u model.User
+	//	database.DB.Find(&u, "user_id=?", uid)
+	//	// 给每个i加上找出来的u.Username
+	//	fmt.Println(i)
+	//}
 
 	c.JSON(200, gin.H{"status": 200, "data": cc})
 }

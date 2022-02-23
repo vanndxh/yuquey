@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"time"
 	"yuquey/database"
 	"yuquey/model"
 )
@@ -50,14 +51,21 @@ func HandleLike(c *gin.Context) {
 			return
 		}
 	}
-
-	// 给用户点赞总数
+	// 找到对应记录
+	var a model.Article
+	res := database.DB.Find(&a, "article_id=?", articleId)
+	if res.Error != nil {
+		fmt.Println(res.Error)
+		return
+	}
 	var u model.User
-	result := database.DB.Find(&u, "user_id=?", userId)
+	result := database.DB.Find(&u, "user_id=?", a.ArticleAuthor)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
 	}
+
+	// 给用户点赞总数
 	likeNow := u.LikeTotal
 	if handle == 0 {
 		database.DB.Model(&u).Update("like_total", likeNow+1)
@@ -66,12 +74,6 @@ func HandleLike(c *gin.Context) {
 	}
 
 	// 给文章点赞数
-	var a model.Article
-	res := database.DB.Find(&a, "article_id=?", articleId)
-	if res.Error != nil {
-		fmt.Println(res.Error)
-		return
-	}
 	likeNow2 := a.LikeAmount
 	if handle == 0 {
 		database.DB.Model(&a).Update("like_amount", likeNow2+1)
@@ -86,6 +88,23 @@ func HandleLike(c *gin.Context) {
 	} else {
 		database.DB.Model(&a).Update("hot", hotNow-1)
 	}
+
+	// 如果是点赞，发消息给作者
+	if handle == 0 && a.ArticleAuthor != userId {
+		newMessage := model.Message{
+			UserId:    a.ArticleAuthor,
+			Type:      0,
+			Op:        userId,
+			ArticleId: articleId,
+			Time:      time.Now(),
+		}
+		err5 := database.DB.Create(&newMessage).Error
+		if err5 != nil {
+			fmt.Println(err5)
+			return
+		}
+	}
+
 	// 返回结果
 	c.JSON(200, gin.H{
 		"msg": "成功！",
