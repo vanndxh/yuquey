@@ -112,14 +112,12 @@ func GetArticleComment(c *gin.Context) {
 		return
 	}
 
-	//var i model.Comment
-	//for i = range cc {
-	//	uid := i.UserId
-	//	var u model.User
-	//	database.DB.Find(&u, "user_id=?", uid)
-	//	// 给每个i加上找出来的u.Username
-	//	fmt.Println(i)
-	//}
+	for i := range cc {
+		uid := cc[i].UserId
+		var u model.User
+		database.DB.Find(&u, "user_id=?", uid)
+		cc[i].Username = u.Username
+	}
 
 	c.JSON(200, gin.H{"status": 200, "data": cc})
 }

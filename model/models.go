@@ -43,6 +43,7 @@ type Team struct {
 type Comment struct {
 	CommentId      int    `gorm:"primary_key;AUTO_INCREASE"`
 	UserId         int    `gorm:"not null"`
+	Username       string `gorm:"-"`
 	ArticleId      int    `gorm:"not null"`
 	CommentContent string `gorm:"not null"`
 }
@@ -65,8 +66,10 @@ type Timeline struct {
 }
 
 type Follow struct {
-	Up       int `gorm:"not null"`
-	Follower int `gorm:"not null"`
+	UpId         int    `gorm:"not null"`
+	UpName       string `gorm:"-"`
+	FollowerId   int    `gorm:"not null"`
+	FollowerName string `gorm:"-"`
 }
 
 type Like struct {

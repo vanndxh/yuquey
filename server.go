@@ -81,6 +81,8 @@ func main() {
 	V1follow := apiV1.Group("/follow")
 	V1follow.POST("/addFollow", api.AddFollow)
 	V1follow.POST("/unFollow", api.UnFollow)
+	V1follow.GET("/getUps", api.GetUps)
+	V1follow.GET("/getFollowers", api.GetFollowers)
 
 	// supportCount
 	V1supportCount := apiV1.Group("/supportCount")

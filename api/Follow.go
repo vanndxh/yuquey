@@ -20,8 +20,8 @@ func AddFollow(c *gin.Context) {
 		return
 	}
 	newFollow := model.Follow{
-		Up:       up,
-		Follower: follower,
+		UpId:       up,
+		FollowerId: follower,
 	}
 	err3 := database.DB.Create(&newFollow).Error
 	if err3 != nil {
@@ -56,7 +56,7 @@ func UnFollow(c *gin.Context) {
 		return
 	}
 	var f model.Follow
-	res := database.DB.Delete(&f, "up=? AND follower=?", up, follower)
+	res := database.DB.Delete(&f, "up_id=? AND follower_id=?", up, follower)
 	if res.Error != nil {
 		fmt.Println(res.Error)
 		return
@@ -72,7 +72,37 @@ func UnFollow(c *gin.Context) {
 	followNow := u2.FollowAmount
 	database.DB.Model(&u2).Update("follow_amount", followNow-1)
 
-	c.JSON(200, gin.H{
-		"msg": "取消关注成功！",
-	})
+	c.JSON(200, gin.H{"msg": "取消关注成功！"})
+}
+
+func GetUps(c *gin.Context) {
+	userId := c.Query("userId")
+	var fs []model.Follow
+	res := database.DB.Find(&fs, "follower_id=?", userId)
+	if res.Error != nil {
+		fmt.Println(res.Error)
+		return
+	}
+	for i := range fs {
+		var u model.User
+		database.DB.Find(&u, "user_id=?", fs[i].UpId)
+		fs[i].UpName = u.Username
+	}
+	c.JSON(200, gin.H{"data": fs})
+}
+
+func GetFollowers(c *gin.Context) {
+	userId := c.Query("userId")
+	var fs []model.Follow
+	res := database.DB.Find(&fs, "up_id=?", userId)
+	if res.Error != nil {
+		fmt.Println(res.Error)
+		return
+	}
+	for i := range fs {
+		var u model.User
+		database.DB.Find(&u, "user_id=?", fs[i].FollowerId)
+		fs[i].FollowerName = u.Username
+	}
+	c.JSON(200, gin.H{"data": fs})
 }
