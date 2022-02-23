@@ -142,9 +142,13 @@ func GetArticleInfo(c *gin.Context) {
 func UpdateArticle(c *gin.Context) {
 	// 获取数据
 	var a model.Article
-	articleId := c.PostForm("articleId")
-	articleName := c.PostForm("articleName")
-	articleContent := c.PostForm("articleContent")
+	articleId, err := strconv.Atoi(c.PostForm("articleId"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	articleName := c.PostForm("newArticleName")
+	articleContent := c.PostForm("newArticleContent")
 	// 判断合理性
 	if len(articleName) == 0 {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
@@ -153,14 +157,7 @@ func UpdateArticle(c *gin.Context) {
 		})
 		return
 	}
-	if len(articleContent) == 0 {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"code": 422,
-			"msg":  "文章内容不能为空！",
-		})
-		return
-	}
-	// 先找到对应文章数据,即a为要update的记录
+	// 先找到对应文章数据
 	result := database.DB.Find(&a, "article_id=?", articleId)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})

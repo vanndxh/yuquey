@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"time"
 	"yuquey/database"
 	"yuquey/model"
 )
@@ -36,6 +37,30 @@ func CreateComment(c *gin.Context) {
 		return
 	}
 
+	var a model.Article
+	res := database.DB.Find(&a, "article_id=?", articleId)
+	if res.Error != nil {
+		fmt.Println(res.Error)
+		return
+	}
+	hotNow := a.Hot
+	database.DB.Model(&a).Update("hot", hotNow+2)
+
+	if a.ArticleAuthor != userId {
+		newMessage := model.Message{
+			UserId:    a.ArticleAuthor,
+			Type:      2,
+			Op:        userId,
+			ArticleId: articleId,
+			Time:      time.Now(),
+		}
+		err5 := database.DB.Create(&newMessage).Error
+		if err5 != nil {
+			fmt.Println(err5)
+			return
+		}
+	}
+
 	c.JSON(200, gin.H{
 		"msg": "评论成功！",
 	})
@@ -49,12 +74,28 @@ func DeleteComment(c *gin.Context) {
 		fmt.Println(err)
 		return
 	}
+
+	res := database.DB.Find(&cc, "comment_id=?", commentId)
+	if res.Error != nil {
+		fmt.Println(res.Error)
+		return
+	}
+	var a model.Article
+	res2 := database.DB.Find(&a, "article_id=?", cc.ArticleId)
+	if res2.Error != nil {
+		fmt.Println(res2.Error)
+		return
+	}
+	hotNow := a.Hot
+	database.DB.Model(&a).Update("hot", hotNow-2)
+
 	// 删除操作
 	result := database.DB.Delete(&cc, "comment_id=?", commentId)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
 	}
+
 	// 返回结果
 	c.JSON(200, gin.H{
 		"msg": "评论删除成功！",

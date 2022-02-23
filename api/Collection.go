@@ -57,9 +57,9 @@ func HandleCollection(c *gin.Context) {
 	}
 	starNow := a.CollectionAmount
 	if handle == 0 {
-		database.DB.Model(&a).Update("star_amount", starNow+1)
+		database.DB.Model(&a).Update("collection_amount", starNow+1)
 	} else {
-		database.DB.Model(&a).Update("star_amount", starNow-1)
+		database.DB.Model(&a).Update("collection_amount", starNow-1)
 	}
 
 	// 给文章热度
