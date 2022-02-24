@@ -58,6 +58,7 @@ func Register(c *gin.Context) {
 	newUser := model.User{
 		Username: username,
 		Password: password,
+		UserInfo: "暂无~",
 	}
 	err := database.DB.Create(&newUser).Error
 	if err != nil {

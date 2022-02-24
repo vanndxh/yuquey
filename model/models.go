@@ -49,13 +49,17 @@ type Comment struct {
 }
 
 type Message struct {
-	MessageId int       `gorm:"primary_key;AUTO_INCREASE"`
-	UserId    int       `gorm:"not null"`
-	Type      int       `gorm:"not null"`
-	Op        int       `gorm:"not null"`
-	ArticleId int       `gorm:""`
-	Read      int       `gorm:"not null"`
-	Time      time.Time `gorm:"not null"`
+	MessageId   int       `gorm:"primary_key;AUTO_INCREASE"`
+	UserId      int       `gorm:"not null"`
+	Username    string    `gorm:"-"`
+	Type        int       `gorm:"not null"`
+	TypeName    string    `gorm:"-"`
+	Op          int       `gorm:"not null"`
+	OpName      string    `gorm:"-"`
+	ArticleId   int       `gorm:""`
+	ArticleName string    `gorm:"-"`
+	Read        int       `gorm:"not null"`
+	Time        time.Time `gorm:"not null"`
 }
 
 type Timeline struct {

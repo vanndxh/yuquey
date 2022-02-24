@@ -114,7 +114,6 @@ func HandleLike(c *gin.Context) {
 func GetIsLiked(c *gin.Context) {
 	userId := c.DefaultQuery("userId", "")
 	articleId := c.DefaultQuery("articleId", "")
-	fmt.Println(userId, "test")
 
 	var l model.Like
 	result := database.DB.Find(&l, "user_id=? AND article_id=?", userId, articleId)
