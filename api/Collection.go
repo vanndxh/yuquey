@@ -106,11 +106,16 @@ func GetFavorite(c *gin.Context) {
 	for i := range s {
 		idSlice[i] = s[i].ArticleId
 	}
-	var a []model.Article
-	result := database.DB.Find(&a, idSlice)
+	var as []model.Article
+	result := database.DB.Find(&as, idSlice)
 
+	for i := range as {
+		var u model.User
+		database.DB.Find(&u, "user_id=?", as[i].ArticleAuthor)
+		as[i].AuthorName = u.Username
+	}
 	if result.RowsAffected != 0 {
-		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": a})
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": as})
 	} else {
 		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "msg": "收藏夹是空的！"})
 	}

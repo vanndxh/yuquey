@@ -10,15 +10,20 @@ import (
 )
 
 func GetArticles(c *gin.Context) {
-	var a []model.Article
+	var as []model.Article
 	articleAuthor := c.DefaultQuery("articleAuthor", "")
 	isInTrash := c.DefaultQuery("isInTrash", "")
-	result := database.DB.Find(&a, "article_author=? AND is_in_trash=?", articleAuthor, isInTrash)
+	result := database.DB.Find(&as, "article_author=? AND is_in_trash=?", articleAuthor, isInTrash)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": a})
+	for i := range as {
+		var u model.User
+		database.DB.Find(&u, "user_id=?", as[i].ArticleAuthor)
+		as[i].AuthorName = u.Username
+	}
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": as})
 }
 
 func SearchArticle(c *gin.Context) {

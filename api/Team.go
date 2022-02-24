@@ -51,16 +51,22 @@ func DeleteTeam(c *gin.Context) {
 func GetTeams(c *gin.Context) {
 	userId := c.DefaultQuery("userId", "")
 
-	var t []model.Team
-	result := database.DB.Find(&t, "team_leader=? OR team_member1=? OR team_member2=? OR team_member3=? OR team_member4=?",
+	var ts []model.Team
+	result := database.DB.Find(&ts, "team_leader=? OR team_member1=? OR team_member2=? OR team_member3=? OR team_member4=?",
 		userId, userId, userId, userId, userId)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
 	}
 
+	for i := range ts {
+		var u model.User
+		database.DB.Find(&u, "user_id=?", ts[i].TeamLeader)
+		ts[i].LeaderName = u.Username
+	}
+
 	if result.RowsAffected != 0 {
-		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": t})
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": ts})
 	} else {
 		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "msg": "没有参与小组~"})
 	}

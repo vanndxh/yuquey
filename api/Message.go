@@ -11,11 +11,26 @@ import (
 
 func GetMessages(c *gin.Context) {
 	userId := c.DefaultQuery("userId", "")
+	handle := c.Query("type")
 	var ms []model.Message
-	res := database.DB.Order("time desc").Find(&ms, "user_id=?", userId)
-	if res.Error != nil {
-		fmt.Println(res.Error)
-		return
+	if handle == "0" {
+		res := database.DB.Order("time desc").Find(&ms, "user_id=?", userId)
+		if res.Error != nil {
+			fmt.Println(res.Error)
+			return
+		}
+	} else if handle == "1" {
+		res := database.DB.Order("time desc").Find(&ms, "user_id=? AND read=?", userId, 1)
+		if res.Error != nil {
+			fmt.Println(res.Error)
+			return
+		}
+	} else if handle == "2" {
+		res := database.DB.Order("time desc").Find(&ms, "user_id=? AND read=?", userId, 0)
+		if res.Error != nil {
+			fmt.Println(res.Error)
+			return
+		}
 	}
 	for i := range ms {
 		var u model.User
