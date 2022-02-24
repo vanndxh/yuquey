@@ -124,3 +124,16 @@ func UpdateUserInfo(c *gin.Context) {
 	// 返回结果
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "success", "data": "用户个人信息修改成功！"})
 }
+
+func GetAllUsers(c *gin.Context) {
+	var us []model.User
+	database.DB.Order("user_id").Find(&us)
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": us})
+}
+
+func DeleteUser(c *gin.Context) {
+	userId := c.Query("userId")
+	var u model.User
+	database.DB.Delete(&u, "user_id=?", userId)
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "ok"})
+}

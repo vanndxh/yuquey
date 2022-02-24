@@ -100,7 +100,7 @@ func DeleteArticle(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
 	}
-	// 给用户文章总数++
+	// 给用户文章总数--
 	var u model.User
 	result2 := database.DB.Find(&u, "user_id=?", userId)
 	if result2.Error != nil {
@@ -199,4 +199,15 @@ func GetHotArticle(c *gin.Context) {
 	}
 	// 返回表单
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": a})
+}
+
+func GetAllArticles(c *gin.Context) {
+	var as []model.Article
+	database.DB.Order("article_id").Find(&as)
+	for i := range as {
+		var u model.User
+		database.DB.Find(&u, "user_id=?", as[i].ArticleAuthor)
+		as[i].AuthorName = u.Username
+	}
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": as})
 }

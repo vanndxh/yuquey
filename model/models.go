@@ -18,6 +18,7 @@ type Article struct {
 	ArticleName      string `gorm:"varchar(20);not null"`
 	ArticleContent   string `gorm:"varchar(200)"`
 	ArticleAuthor    int    `gorm:"not null"`
+	AuthorName       string `gorm:"-"`
 	LikeAmount       int    `gorm:"not null"`
 	CollectionAmount int    `gorm:"not null"`
 	IsInTrash        int    `gorm:"not null"`
@@ -29,14 +30,19 @@ type Team struct {
 	TeamName     string `gorm:"varchar(10);not null"`
 	TeamNotice   string `gorm:"varchar(40)"`
 	TeamLeader   int    `gorm:"not null"`
+	LeaderName   string `gorm:"-"`
 	LeaderCount  int    `gorm:"not null"`
 	TeamMember1  int    `gorm:""`
+	Member1Name  string `gorm:"-"`
 	Member1Count int    `gorm:"not null"`
 	TeamMember2  int    `gorm:""`
+	Member2Name  string `gorm:"-"`
 	Member2Count int    `gorm:"not null"`
 	TeamMember3  int    `gorm:""`
+	Member3Name  string `gorm:"-"`
 	Member3Count int    `gorm:"not null"`
 	TeamMember4  int    `gorm:""`
+	Member4Name  string `gorm:"-"`
 	Member4Count int    `gorm:"not null"`
 }
 
@@ -45,6 +51,7 @@ type Comment struct {
 	UserId         int    `gorm:"not null"`
 	Username       string `gorm:"-"`
 	ArticleId      int    `gorm:"not null"`
+	ArticleName    string `gorm:"-"`
 	CommentContent string `gorm:"not null"`
 }
 

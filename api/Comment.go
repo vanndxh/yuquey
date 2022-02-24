@@ -67,13 +67,8 @@ func CreateComment(c *gin.Context) {
 }
 
 func DeleteComment(c *gin.Context) {
-	// 获取数据
 	var cc model.Comment
-	commentId, err := strconv.Atoi(c.PostForm("commentId"))
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	commentId := c.Query("commentId")
 
 	res := database.DB.Find(&cc, "comment_id=?", commentId)
 	if res.Error != nil {
@@ -133,4 +128,18 @@ func GetUserComment(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{"status": 200, "data": cc})
+}
+
+func GetAllComments(c *gin.Context) {
+	var cs []model.Comment
+	database.DB.Order("comment_id").Find(&cs)
+	for i := range cs {
+		var u model.User
+		database.DB.Find(&u, "user_id=?", cs[i].UserId)
+		cs[i].Username = u.Username
+		var a model.Article
+		database.DB.Find(&a, "article_id=?", cs[i].ArticleId)
+		cs[i].ArticleName = a.ArticleName
+	}
+	c.JSON(200, gin.H{"status": 200, "data": cs})
 }

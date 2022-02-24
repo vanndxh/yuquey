@@ -34,13 +34,8 @@ func CreateTeam(c *gin.Context) {
 }
 
 func DeleteTeam(c *gin.Context) {
-	// 获取小组id
+	teamId := c.Query("teamId")
 	var t model.Team
-	teamId, err := strconv.Atoi(c.PostForm("teamId"))
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
 	// 删除操作
 	result := database.DB.Delete(&t, "team_id=?", teamId)
 	if result.Error != nil {
@@ -248,4 +243,27 @@ func GetTeamMembers(c *gin.Context) {
 		return
 	}
 	c.JSON(200, gin.H{"status": 200, "data": u})
+}
+
+func GetAllTeams(c *gin.Context) {
+	var ts []model.Team
+	database.DB.Order("team_id").Find(&ts)
+	for i := range ts {
+		var u1 model.User
+		database.DB.Find(&u1, "user_id=?", ts[i].TeamLeader)
+		ts[i].LeaderName = u1.Username
+		var u2 model.User
+		database.DB.Find(&u2, "user_id=?", ts[i].TeamMember1)
+		ts[i].Member1Name = u2.Username
+		var u3 model.User
+		database.DB.Find(&u3, "user_id=?", ts[i].TeamMember2)
+		ts[i].Member2Name = u3.Username
+		var u4 model.User
+		database.DB.Find(&u4, "user_id=?", ts[i].TeamMember3)
+		ts[i].Member3Name = u4.Username
+		var u5 model.User
+		database.DB.Find(&u5, "user_id=?", ts[i].TeamMember4)
+		ts[i].Member4Name = u5.Username
+	}
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": ts})
 }
