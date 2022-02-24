@@ -43,9 +43,32 @@ func DeleteTeam(c *gin.Context) {
 		return
 	}
 	// 返回结果
-	c.JSON(200, gin.H{
-		"msg": "小组删除成功！",
-	})
+	c.JSON(200, gin.H{"msg": "小组删除成功！"})
+}
+
+func DeleteTeamUser(c *gin.Context) {
+	teamId := c.Query("teamId")
+	teamUser, err := strconv.Atoi(c.Query("teamUser"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	var t model.Team
+	database.DB.Find(&t, "team_id=?", teamId)
+	if teamUser == t.TeamMember1 {
+		database.DB.Model(&t).Update("team_member1", 0)
+		database.DB.Model(&t).Update("member1_count", 0)
+	} else if teamUser == t.TeamMember2 {
+		database.DB.Model(&t).Update("team_member2", 0)
+		database.DB.Model(&t).Update("member2_count", 0)
+	} else if teamUser == t.TeamMember3 {
+		database.DB.Model(&t).Update("team_member3", 0)
+		database.DB.Model(&t).Update("member3_count", 0)
+	} else if teamUser == t.TeamMember4 {
+		database.DB.Model(&t).Update("team_member4", 0)
+		database.DB.Model(&t).Update("member4_count", 0)
+	}
+	c.JSON(200, gin.H{"msg": "ok！"})
 }
 
 func GetTeams(c *gin.Context) {
@@ -81,7 +104,21 @@ func GetTeamInfo(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
 	}
-
+	var u1 model.User
+	database.DB.Find(&u1, "user_id=?", t.TeamLeader)
+	t.LeaderName = u1.Username
+	var u2 model.User
+	database.DB.Find(&u2, "user_id=?", t.TeamMember1)
+	t.Member1Name = u2.Username
+	var u3 model.User
+	database.DB.Find(&u3, "user_id=?", t.TeamMember2)
+	t.Member2Name = u3.Username
+	var u4 model.User
+	database.DB.Find(&u4, "user_id=?", t.TeamMember3)
+	t.Member3Name = u4.Username
+	var u5 model.User
+	database.DB.Find(&u5, "user_id=?", t.TeamMember4)
+	t.Member4Name = u5.Username
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": t})
 }
 
@@ -223,14 +260,19 @@ func GetTeamArticles(c *gin.Context) {
 		fmt.Println(res.Error)
 		return
 	}
-	var a []model.Article
-	res2 := database.DB.Find(&a, "article_author=? OR article_author=? OR article_author=? OR article_author=? OR article_author=?",
+	var as []model.Article
+	res2 := database.DB.Find(&as, "article_author=? OR article_author=? OR article_author=? OR article_author=? OR article_author=?",
 		t.TeamLeader, t.TeamMember1, t.TeamMember2, t.TeamMember3, t.TeamMember4)
 	if res2.Error != nil {
 		fmt.Println(res2.Error)
 		return
 	}
-	c.JSON(200, gin.H{"status": 200, "data": a})
+	for i := range as {
+		var u model.User
+		database.DB.Find(&u, "user_id=?", as[i].ArticleAuthor)
+		as[i].AuthorName = u.Username
+	}
+	c.JSON(200, gin.H{"status": 200, "data": as})
 }
 
 func GetTeamMembers(c *gin.Context) {
@@ -241,14 +283,14 @@ func GetTeamMembers(c *gin.Context) {
 		fmt.Println(res.Error)
 		return
 	}
-	var u []model.User
-	res2 := database.DB.Find(&u, "user_id=? OR user_id=? OR user_id=? OR user_id=? OR user_id=?",
+	var us []model.User
+	res2 := database.DB.Find(&us, "user_id=? OR user_id=? OR user_id=? OR user_id=? OR user_id=?",
 		t.TeamLeader, t.TeamMember1, t.TeamMember2, t.TeamMember3, t.TeamMember4)
 	if res2.Error != nil {
 		fmt.Println(res2.Error)
 		return
 	}
-	c.JSON(200, gin.H{"status": 200, "data": u})
+	c.JSON(200, gin.H{"status": 200, "data": us})
 }
 
 func GetAllTeams(c *gin.Context) {

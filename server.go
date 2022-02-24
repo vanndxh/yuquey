@@ -51,6 +51,7 @@ func main() {
 	V1team.GET("/getTeamArticles", api.GetTeamArticles)
 	V1team.GET("/getTeamMembers", api.GetTeamMembers)
 	V1team.GET("/getAllTeams", api.GetAllTeams)
+	V1team.DELETE("/deleteTeamUser", api.DeleteTeamUser)
 
 	// comment
 	V1comment := apiV1.Group("/comment")
