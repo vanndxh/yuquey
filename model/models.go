@@ -4,18 +4,18 @@ import "time"
 
 type User struct {
 	UserId         int    `gorm:"primary_key;AUTO_INCREASE"`
-	Username       string `gorm:"varchar(20);not null"`
-	Password       string `gorm:"size:255;not null"`
-	UserInfo       string `gorm:"varchar(200)"`
+	Username       string `gorm:"varchar(10);not null"`
+	Password       string `gorm:"not null"`
+	UserInfo       string `gorm:"varchar(60)"`
 	ArticleAmount  int    `gorm:"not null"`
-	LikeTotal      int    `gorm:"not null"`
+	LikeAmount     int    `gorm:"not null"`
 	FollowAmount   int    `gorm:"not null"`
 	FollowerAmount int    `gorm:"not null"`
 }
 
 type Article struct {
 	ArticleId        int    `gorm:"primary_key;AUTO_INCREASE"`
-	ArticleName      string `gorm:"varchar(20);not null"`
+	ArticleName      string `gorm:"varchar(10);not null"`
 	ArticleContent   string `gorm:"varchar(200)"`
 	ArticleAuthor    int    `gorm:"not null"`
 	AuthorName       string `gorm:"-"`
@@ -56,17 +56,14 @@ type Comment struct {
 }
 
 type Message struct {
-	MessageId   int       `gorm:"primary_key;AUTO_INCREASE"`
-	UserId      int       `gorm:"not null"`
-	Username    string    `gorm:"-"`
-	Type        int       `gorm:"not null"`
-	TypeName    string    `gorm:"-"`
-	Op          int       `gorm:"not null"`
-	OpName      string    `gorm:"-"`
-	ArticleId   int       `gorm:""`
-	ArticleName string    `gorm:"-"`
-	Read        int       `gorm:"not null"`
-	Time        time.Time `gorm:"not null"`
+	MessageId int       `gorm:"primary_key;AUTO_INCREASE"`
+	UserId    int       `gorm:"not null"`
+	Type      int       `gorm:"not null"` // 0-all 1-like 2-collection 3-comment 4-follow
+	Op        int       `gorm:"not null"`
+	ArticleId int       `gorm:""`
+	Content   string    `gorm:"-"`
+	Read      int       `gorm:"not null"`
+	Time      time.Time `gorm:"not null"`
 }
 
 type Timeline struct {

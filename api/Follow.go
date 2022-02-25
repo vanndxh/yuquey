@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"strconv"
+	"time"
 	"yuquey/database"
 	"yuquey/model"
 )
@@ -43,6 +44,7 @@ func HandleFollow(c *gin.Context) {
 		}
 	}
 
+	// 关注/粉丝数
 	var u1 model.User
 	database.DB.Find(&u1, "user_id=?", up)
 	followerNow := u1.FollowerAmount
@@ -51,7 +53,6 @@ func HandleFollow(c *gin.Context) {
 	} else {
 		database.DB.Model(&u1).Update("follower_amount", followerNow-1)
 	}
-
 	var u2 model.User
 	database.DB.Find(&u2, "user_id=?", follower)
 	followNow := u2.FollowAmount
@@ -61,44 +62,57 @@ func HandleFollow(c *gin.Context) {
 		database.DB.Model(&u2).Update("follow_amount", followNow-1)
 	}
 
+	// 消息
+	if handle == 0 {
+		newMessage := model.Message{
+			UserId: up,
+			Type:   4,
+			Op:     follower,
+			Read:   1,
+			Time:   time.Now(),
+		}
+		err5 := database.DB.Create(&newMessage).Error
+		if err5 != nil {
+			fmt.Println(err5)
+			return
+		}
+	}
+
 	c.JSON(200, gin.H{
 		"msg": "成功！",
 	})
 }
 
-func GetUps(c *gin.Context) {
+func GetFollows(c *gin.Context) {
 	userId := c.Query("userId")
-	var fs []model.Follow
-	res := database.DB.Find(&fs, "follower_id=?", userId)
+	// up
+	var fs1 []model.Follow
+	res := database.DB.Find(&fs1, "follower_id=?", userId)
 	if res.Error != nil {
 		fmt.Println(res.Error)
 		return
 	}
-	for i := range fs {
-		var u model.User
-		database.DB.Find(&u, "user_id=?", fs[i].UpId)
-		fs[i].UpName = u.Username
+	for i := range fs1 {
+		var u1 model.User
+		database.DB.Find(&u1, "user_id=?", fs1[i].UpId)
+		fs1[i].UpName = u1.Username
 	}
-	c.JSON(200, gin.H{"data": fs})
-}
-
-func GetFollowers(c *gin.Context) {
-	userId := c.Query("userId")
-	var fs []model.Follow
-	res := database.DB.Find(&fs, "up_id=?", userId)
-	if res.Error != nil {
-		fmt.Println(res.Error)
+	// follower
+	var fs2 []model.Follow
+	res2 := database.DB.Find(&fs2, "up_id=?", userId)
+	if res2.Error != nil {
+		fmt.Println(res2.Error)
 		return
 	}
-	for i := range fs {
-		var u model.User
-		database.DB.Find(&u, "user_id=?", fs[i].FollowerId)
-		fs[i].FollowerName = u.Username
+	for i := range fs2 {
+		var u2 model.User
+		database.DB.Find(&u2, "user_id=?", fs2[i].FollowerId)
+		fs2[i].FollowerName = u2.Username
 	}
-	c.JSON(200, gin.H{"data": fs})
+	c.JSON(200, gin.H{"upData": fs1, "followerData": fs2})
 }
 
-func GetIsFollowed(c *gin.Context) {
+func GetIsFollowed(c *gin.Context) { // 判断当前是否关注
 	userId := c.Query("userId")
 	upId := c.Query("upId")
 	var f model.Follow

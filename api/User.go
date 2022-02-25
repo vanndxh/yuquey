@@ -68,7 +68,6 @@ func Register(c *gin.Context) {
 	//返回结果
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "注册成功！", "userId": newUser.UserId, "password": newUser.Password})
 }
-
 func Login(c *gin.Context) {
 	// 获取参数
 	var u model.User
@@ -96,13 +95,41 @@ func Login(c *gin.Context) {
 	}
 }
 
-func GetUserInfo(c *gin.Context) {
-	userId := c.DefaultQuery("userId", "")
+func DeleteUser(c *gin.Context) {
+	userId := c.Query("userId")
 
-	var user model.User
-	database.DB.Find(&user, "user_id=?", userId)
+	// 删除用户
+	var u model.User
+	database.DB.Delete(&u, "user_id=?", userId)
 
-	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "success", "data": user})
+	// 清除他的所有文章
+	var a model.Article
+	database.DB.Delete(&a, "article_author=?", userId)
+
+	// 退出他在的所有小组
+	// here?
+
+	// 清楚所有评论
+	var cc model.Comment
+	database.DB.Delete(&cc, "user_id=?", userId)
+
+	// 清除所有通知
+	var m model.Message
+	database.DB.Delete(&m, "user_id=?", userId)
+
+	// 清除关注信息
+	var f1 model.Follow
+	database.DB.Delete(&f1, "up_id=?", userId)
+	var f2 model.Follow
+	database.DB.Delete(&f2, "follower_id=?", userId)
+
+	// 清除点赞收藏信息
+	var l model.Like
+	database.DB.Delete(&l, "user_id=?", userId)
+	var co model.Collection
+	database.DB.Delete(&co, "user_id=?", userId)
+
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "ok"})
 }
 
 func UpdateUserInfo(c *gin.Context) {
@@ -125,15 +152,16 @@ func UpdateUserInfo(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "success", "data": "用户个人信息修改成功！"})
 }
 
+func GetUserInfo(c *gin.Context) {
+	userId := c.DefaultQuery("userId", "")
+
+	var user model.User
+	database.DB.Find(&user, "user_id=?", userId)
+
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "success", "data": user})
+}
 func GetAllUsers(c *gin.Context) {
 	var us []model.User
 	database.DB.Order("user_id").Find(&us)
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": us})
-}
-
-func DeleteUser(c *gin.Context) {
-	userId := c.Query("userId")
-	var u model.User
-	database.DB.Delete(&u, "user_id=?", userId)
-	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "ok"})
 }

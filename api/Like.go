@@ -66,11 +66,11 @@ func HandleLike(c *gin.Context) {
 	}
 
 	// 给用户点赞总数
-	likeNow := u.LikeTotal
+	likeNow := u.LikeAmount
 	if handle == 0 {
-		database.DB.Model(&u).Update("like_total", likeNow+1)
+		database.DB.Model(&u).Update("like_amount", likeNow+1)
 	} else {
-		database.DB.Model(&u).Update("like_total", likeNow-1)
+		database.DB.Model(&u).Update("like_amount", likeNow-1)
 	}
 
 	// 给文章点赞数
@@ -93,9 +93,10 @@ func HandleLike(c *gin.Context) {
 	if handle == 0 && a.ArticleAuthor != userId {
 		newMessage := model.Message{
 			UserId:    a.ArticleAuthor,
-			Type:      0,
+			Type:      1,
 			Op:        userId,
 			ArticleId: articleId,
+			Read:      1,
 			Time:      time.Now(),
 		}
 		err5 := database.DB.Create(&newMessage).Error

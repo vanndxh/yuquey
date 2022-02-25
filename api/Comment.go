@@ -49,7 +49,8 @@ func CreateComment(c *gin.Context) {
 	if a.ArticleAuthor != userId {
 		newMessage := model.Message{
 			UserId:    a.ArticleAuthor,
-			Type:      2,
+			Type:      3,
+			Read:      1,
 			Op:        userId,
 			ArticleId: articleId,
 			Time:      time.Now(),
@@ -116,7 +117,6 @@ func GetArticleComment(c *gin.Context) {
 
 	c.JSON(200, gin.H{"status": 200, "data": cc})
 }
-
 func GetUserComment(c *gin.Context) {
 	userId := c.DefaultQuery("userId", "")
 
@@ -129,7 +129,6 @@ func GetUserComment(c *gin.Context) {
 
 	c.JSON(200, gin.H{"status": 200, "data": cc})
 }
-
 func GetAllComments(c *gin.Context) {
 	var cs []model.Comment
 	database.DB.Order("comment_id").Find(&cs)

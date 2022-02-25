@@ -9,40 +9,6 @@ import (
 	"yuquey/model"
 )
 
-func GetArticles(c *gin.Context) {
-	var as []model.Article
-	articleAuthor := c.DefaultQuery("articleAuthor", "")
-	isInTrash := c.DefaultQuery("isInTrash", "")
-	result := database.DB.Find(&as, "article_author=? AND is_in_trash=?", articleAuthor, isInTrash)
-	if result.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
-		return
-	}
-	for i := range as {
-		var u model.User
-		database.DB.Find(&u, "user_id=?", as[i].ArticleAuthor)
-		as[i].AuthorName = u.Username
-	}
-	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": as})
-}
-
-func SearchArticle(c *gin.Context) {
-	searchValue := c.DefaultQuery("searchValue", "")
-
-	var a []model.Article
-	result := database.DB.Order("hot desc").Find(&a, "article_name like ?", "%"+searchValue+"%")
-	if result.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
-		return
-	}
-
-	if result.RowsAffected != 0 {
-		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": a})
-	} else {
-		c.JSON(http.StatusOK, gin.H{"status": 200, "data": "none"})
-	}
-}
-
 func CreateArticle(c *gin.Context) {
 	// 获取数据
 	articleContent := c.PostForm("articleContent")
@@ -120,30 +86,6 @@ func DeleteArticle(c *gin.Context) {
 	})
 }
 
-func GetArticleInfo(c *gin.Context) {
-	// 获取数据
-	var a model.Article
-	articleId := c.DefaultQuery("articleId", "")
-	// 查找对应文章
-	result := database.DB.Find(&a, "article_id=?", articleId)
-	if result.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
-		return
-	}
-	var u model.User
-	res := database.DB.Find(&u, "user_id=?", a.ArticleAuthor)
-	if res.Error != nil {
-		fmt.Println(res.Error)
-		return
-	}
-	// 返回表单
-	if result.RowsAffected != 0 {
-		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": a, "authorName": u.Username})
-	} else {
-		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "msg": "This article is not exist."})
-	}
-}
-
 func UpdateArticle(c *gin.Context) {
 	// 获取数据
 	var a model.Article
@@ -174,7 +116,6 @@ func UpdateArticle(c *gin.Context) {
 	// 返回结果
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "文章修改成功！"})
 }
-
 func TransTrash(c *gin.Context) {
 	var a model.Article
 	articleId := c.PostForm("articleId")
@@ -193,6 +134,62 @@ func TransTrash(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "success", "data": "成功移入垃圾箱！"})
 }
 
+func GetArticles(c *gin.Context) { // 根据用户获取
+	articleAuthor := c.DefaultQuery("articleAuthor", "")
+	isInTrash := c.DefaultQuery("isInTrash", "")
+
+	var as []model.Article
+	result := database.DB.Find(&as, "article_author=? AND is_in_trash=?", articleAuthor, isInTrash)
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
+		return
+	}
+	for i := range as {
+		var u model.User
+		database.DB.Find(&u, "user_id=?", as[i].ArticleAuthor)
+		as[i].AuthorName = u.Username
+	}
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": as})
+}
+func SearchArticle(c *gin.Context) { // 根据搜索内容模糊查询
+	searchValue := c.DefaultQuery("searchValue", "")
+
+	var a []model.Article
+	result := database.DB.Order("hot desc").Find(&a, "article_name like ?", "%"+searchValue+"%")
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
+		return
+	}
+
+	if result.RowsAffected != 0 {
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": a})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"status": 200, "data": "none"})
+	}
+}
+func GetArticleInfo(c *gin.Context) {
+	// 获取数据
+	var a model.Article
+	articleId := c.DefaultQuery("articleId", "")
+	// 查找对应文章
+	result := database.DB.Find(&a, "article_id=?", articleId)
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
+		return
+	}
+	var u model.User
+	res := database.DB.Find(&u, "user_id=?", a.ArticleAuthor)
+	if res.Error != nil {
+		fmt.Println(res.Error)
+		return
+	}
+	// 返回表单
+	if result.RowsAffected != 0 {
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": a, "authorName": u.Username})
+	} else {
+		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "msg": "This article is not exist."})
+	}
+}
 func GetHotArticle(c *gin.Context) {
 	// 获取数据
 	var a []model.Article
@@ -205,7 +202,6 @@ func GetHotArticle(c *gin.Context) {
 	// 返回表单
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": a})
 }
-
 func GetAllArticles(c *gin.Context) {
 	var as []model.Article
 	database.DB.Order("article_id").Find(&as)

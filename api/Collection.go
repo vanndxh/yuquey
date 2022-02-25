@@ -22,7 +22,7 @@ func HandleCollection(c *gin.Context) {
 		fmt.Println(err2)
 		return
 	}
-	handle, err3 := strconv.Atoi(c.PostForm("handle"))
+	handle, err3 := strconv.Atoi(c.PostForm("handle")) // 0-add 1-delete
 	if err3 != nil {
 		fmt.Println(err3)
 		return
@@ -74,7 +74,8 @@ func HandleCollection(c *gin.Context) {
 	if handle == 0 && a.ArticleAuthor != userId {
 		newMessage := model.Message{
 			UserId:    a.ArticleAuthor,
-			Type:      1,
+			Type:      2,
+			Read:      1,
 			Op:        userId,
 			ArticleId: articleId,
 			Time:      time.Now(),
@@ -92,7 +93,7 @@ func HandleCollection(c *gin.Context) {
 	})
 }
 
-func GetFavorite(c *gin.Context) {
+func GetFavorite(c *gin.Context) { // 根据用户获取所有收藏的文章
 	userId := c.DefaultQuery("userId", "")
 
 	var s []model.Collection
@@ -120,7 +121,6 @@ func GetFavorite(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "msg": "收藏夹是空的！"})
 	}
 }
-
 func GetIsCollected(c *gin.Context) {
 	userId := c.DefaultQuery("userId", "")
 	articleId := c.DefaultQuery("articleId", "")
