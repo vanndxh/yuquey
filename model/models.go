@@ -29,6 +29,8 @@ type Team struct {
 	TeamId     int    `gorm:"primary_key;AUTO_INCREASE"`
 	TeamName   string `gorm:"varchar(10);not null"`
 	TeamNotice string `gorm:"varchar(40)"`
+	TeamLeader int    `gorm:"not null"`
+	LeaderName string `gorm:"-"`
 }
 
 type TeamUser struct {
