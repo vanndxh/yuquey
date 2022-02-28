@@ -12,29 +12,31 @@ import (
 func CreateTeam(c *gin.Context) {
 	// 获取数据
 	teamName := c.PostForm("teamName")
-	teamLeader, err := strconv.Atoi(c.PostForm("teamLeader"))
+	userId, err := strconv.Atoi(c.PostForm("userId"))
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	// 创建新小组
 	newTeam := model.Team{
-		TeamName:   teamName,
-		TeamLeader: teamLeader,
+		TeamName: teamName,
 	}
 	err2 := database.DB.Create(&newTeam).Error
 	if err2 != nil {
 		fmt.Println(err2)
 		return
 	}
+	// 小组成员中，加入组长
+	newTeamUser := model.TeamUser{
+		UserId: userId,
+		TeamId: newTeam.TeamId,
+	}
+	database.DB.Create(&newTeamUser)
 	// 返回结果
-	c.JSON(200, gin.H{
-		"msg": "小组创建成功！",
-	})
+	c.JSON(200, gin.H{"msg": "小组创建成功！"})
 }
 func AddTeamUser(c *gin.Context) {
 	// 获取数据
-	var t model.Team
 	teamId, err := strconv.Atoi(c.PostForm("teamId"))
 	if err != nil {
 		fmt.Println(err)
@@ -45,41 +47,39 @@ func AddTeamUser(c *gin.Context) {
 		fmt.Println(err2)
 		return
 	}
-	// 找到对应记录
-	result := database.DB.Find(&t, "team_id=?", teamId)
-	if result.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
-		return
-	}
 	// 判断是否已经存在
-	if newUserId == t.TeamLeader || newUserId == t.TeamMember1 || newUserId == t.TeamMember2 || newUserId == t.TeamMember3 || newUserId == t.TeamMember4 {
+	var t model.TeamUser
+	result := database.DB.Find(&t, "team_id=? AND user_id=?", teamId, newUserId)
+	if result.RowsAffected != 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": "小组成员已经存在！"})
 		return
 	}
-	// 把新用户id放入第一个空位
-	if t.TeamMember1 == 0 {
-		database.DB.Model(&t).Update("team_member1", newUserId)
-	} else if t.TeamMember2 == 0 {
-		database.DB.Model(&t).Update("team_member2", newUserId)
-	} else if t.TeamMember3 == 0 {
-		database.DB.Model(&t).Update("team_member3", newUserId)
-	} else if t.TeamMember4 == 0 {
-		database.DB.Model(&t).Update("team_member4", newUserId)
-	} else {
-		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": "小组成员已满，无法加入！"})
-		return
+	// 小组成员中，加入组员
+	newTeamUser := model.TeamUser{
+		UserId:   newUserId,
+		TeamId:   teamId,
+		Position: 1,
 	}
+	database.DB.Create(&newTeamUser)
 	// 返回结果
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "小组成员添加成功！"})
 }
 
 func DeleteTeam(c *gin.Context) {
 	teamId := c.Query("teamId")
-	var t model.Team
 	// 删除操作
+	var t model.Team
 	result := database.DB.Delete(&t, "team_id=?", teamId)
 	if result.Error != nil {
+		fmt.Println(1)
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
+		return
+	}
+	// 删除该小组相关组员信息
+	var tu model.TeamUser
+	res := database.DB.Delete(&tu, "team_id=?", teamId)
+	if res.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": res.Error.Error()})
 		return
 	}
 	// 返回结果
@@ -87,32 +87,19 @@ func DeleteTeam(c *gin.Context) {
 }
 func DeleteTeamUser(c *gin.Context) {
 	teamId := c.Query("teamId")
-	teamUser, err := strconv.Atoi(c.Query("teamUser"))
-	if err != nil {
-		fmt.Println(err)
-		return
+	teamUser := c.Query("teamUser")
+
+	var tu model.TeamUser
+	res := database.DB.Delete(&tu, "team_id=? AND user_id=?", teamId, teamUser)
+	if res.Error != nil {
+		c.JSON(400, gin.H{"msg": res.Error.Error()})
 	}
-	var t model.Team
-	database.DB.Find(&t, "team_id=?", teamId)
-	if teamUser == t.TeamMember1 {
-		database.DB.Model(&t).Update("team_member1", 0)
-		database.DB.Model(&t).Update("member1_count", 0)
-	} else if teamUser == t.TeamMember2 {
-		database.DB.Model(&t).Update("team_member2", 0)
-		database.DB.Model(&t).Update("member2_count", 0)
-	} else if teamUser == t.TeamMember3 {
-		database.DB.Model(&t).Update("team_member3", 0)
-		database.DB.Model(&t).Update("member3_count", 0)
-	} else if teamUser == t.TeamMember4 {
-		database.DB.Model(&t).Update("team_member4", 0)
-		database.DB.Model(&t).Update("member4_count", 0)
-	}
+
 	c.JSON(200, gin.H{"msg": "ok！"})
 }
 
 func UpdateTeamInfo(c *gin.Context) {
 	// 获取数据
-	var t model.Team
 	teamId, err := strconv.Atoi(c.PostForm("teamId"))
 	if err != nil {
 		fmt.Println(err)
@@ -121,6 +108,7 @@ func UpdateTeamInfo(c *gin.Context) {
 	teamName := c.PostForm("teamName")
 	teamNotice := c.PostForm("teamNotice")
 	// 找到对应记录
+	var t model.Team
 	result := database.DB.Find(&t, "team_id=?", teamId)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
@@ -143,28 +131,17 @@ func Punch(c *gin.Context) {
 		fmt.Println(err2)
 		return
 	}
-	var t model.Team
-	res := database.DB.Find(&t, "team_id=?", teamId)
+
+	var tu model.TeamUser
+	res := database.DB.Find(&tu, "team_id=? AND user_id=?", teamId, userId)
 	if res.Error != nil {
 		fmt.Println(res.Error)
 		return
 	}
-	if t.TeamLeader == userId {
-		countNow := t.LeaderCount
-		database.DB.Model(&t).Update("leader_count", countNow+1)
-	} else if t.TeamMember1 == userId {
-		countNow := t.Member1Count
-		database.DB.Model(&t).Update("member1_count", countNow+1)
-	} else if t.TeamMember2 == userId {
-		countNow := t.Member2Count
-		database.DB.Model(&t).Update("member2_count", countNow+1)
-	} else if t.TeamMember3 == userId {
-		countNow := t.Member3Count
-		database.DB.Model(&t).Update("member3_count", countNow+1)
-	} else if t.TeamMember4 == userId {
-		countNow := t.Member4Count
-		database.DB.Model(&t).Update("member4_count", countNow+1)
-	}
+	punchNow := tu.Punch
+	database.DB.Model(&tu).Where("team_id=? AND user_id=?", teamId, userId).Update("punch", punchNow+1)
+
+	c.JSON(200, gin.H{"msg": "ok"})
 }
 func QuitTeam(c *gin.Context) {
 	userId, err := strconv.Atoi(c.PostForm("userId"))
@@ -177,112 +154,114 @@ func QuitTeam(c *gin.Context) {
 		fmt.Println(err2)
 		return
 	}
-	var t model.Team
-	res := database.DB.Find(&t, "team_id=?", teamId)
-	if res.Error != nil {
-		fmt.Println(res.Error)
-		return
+	var tu model.TeamUser
+	database.DB.Find(&tu, "team_id=? AND user_id=?", teamId, userId)
+	if tu.Position == 0 {
+		// 删除操作
+		var t model.Team
+		result := database.DB.Delete(&t, "team_id=?", teamId)
+		if result.Error != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
+			return
+		}
+		// 删除该小组相关组员信息
+		var tus model.TeamUser
+		res := database.DB.Delete(&tus, "team_id=?", teamId)
+		if res.Error != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": res.Error.Error()})
+			return
+		}
+	} else if tu.Position == 1 {
+		var tuu model.TeamUser
+		res2 := database.DB.Delete(&tuu, "team_id=? AND user_id=?", teamId, userId)
+		if res2.Error != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": res2.Error.Error()})
+			return
+		}
 	}
-	if t.TeamLeader == userId {
-		database.DB.Delete(&t)
-	} else if t.TeamMember1 == userId {
-		database.DB.Model(&t).Update("team_member1", 0)
-	} else if t.TeamMember2 == userId {
-		database.DB.Model(&t).Update("team_member2", 0)
-	} else if t.TeamMember3 == userId {
-		database.DB.Model(&t).Update("team_member3", 0)
-	} else if t.TeamMember4 == userId {
-		database.DB.Model(&t).Update("team_member4", 0)
-	}
+
+	c.JSON(200, gin.H{"msg": "ok"})
 }
 
 func GetTeamArticles(c *gin.Context) {
-	teamId := c.DefaultQuery("teamId", "")
+	teamId := c.Query("teamId")
 
-	var t model.Team
-	res := database.DB.Find(&t, "team_id=?", teamId)
+	// 根据teamId找到有哪些用户(tus
+	var tus []model.TeamUser
+	res := database.DB.Find(&tus, "team_id=?", teamId)
 	if res.Error != nil {
 		fmt.Println(res.Error)
 		return
 	}
+	// 从tus中截取出所有的用户id
+	userIds := make([]int, len(tus))
+	for i := range tus {
+		userIds[i] = tus[i].UserId
+	}
+	// 根据用户找到所有文章
 	var as []model.Article
-	res2 := database.DB.Find(&as, "article_author=? OR article_author=? OR article_author=? OR article_author=? OR article_author=?",
-		t.TeamLeader, t.TeamMember1, t.TeamMember2, t.TeamMember3, t.TeamMember4)
+	res2 := database.DB.Find(&as, "article_author=? ", userIds)
 	if res2.Error != nil {
 		fmt.Println(res2.Error)
 		return
 	}
-	for i := range as {
+	// 再给每个找到的a获取authorName
+	for j := range as {
 		var u model.User
-		database.DB.Find(&u, "user_id=?", as[i].ArticleAuthor)
-		as[i].AuthorName = u.Username
+		database.DB.Find(&u, "user_id=?", as[j].ArticleAuthor)
+		as[j].AuthorName = u.Username
 	}
+
 	c.JSON(200, gin.H{"status": 200, "data": as})
 }
 func GetTeamMembers(c *gin.Context) {
-	teamId := c.DefaultQuery("teamId", "")
-	var t model.Team
-	res := database.DB.Find(&t, "team_id=?", teamId)
+	teamId := c.Query("teamId")
+
+	var tus []model.TeamUser
+	res := database.DB.Find(&tus, "team_id=?", teamId)
 	if res.Error != nil {
 		fmt.Println(res.Error)
 		return
 	}
-	var us []model.User
-	res2 := database.DB.Find(&us, "user_id=? OR user_id=? OR user_id=? OR user_id=? OR user_id=?",
-		t.TeamLeader, t.TeamMember1, t.TeamMember2, t.TeamMember3, t.TeamMember4)
-	if res2.Error != nil {
-		fmt.Println(res2.Error)
-		return
+
+	for i := range tus {
+		var u model.User
+		database.DB.Find(&u, "user_id=?", tus[i].UserId)
+		tus[i].Username = u.Username
 	}
-	c.JSON(200, gin.H{"status": 200, "data": us})
+
+	c.JSON(200, gin.H{"status": 200, "data": tus})
 }
 func GetAllTeams(c *gin.Context) {
 	var ts []model.Team
 	database.DB.Order("team_id").Find(&ts)
-	for i := range ts {
-		var u1 model.User
-		database.DB.Find(&u1, "user_id=?", ts[i].TeamLeader)
-		ts[i].LeaderName = u1.Username
-		var u2 model.User
-		database.DB.Find(&u2, "user_id=?", ts[i].TeamMember1)
-		ts[i].Member1Name = u2.Username
-		var u3 model.User
-		database.DB.Find(&u3, "user_id=?", ts[i].TeamMember2)
-		ts[i].Member2Name = u3.Username
-		var u4 model.User
-		database.DB.Find(&u4, "user_id=?", ts[i].TeamMember3)
-		ts[i].Member3Name = u4.Username
-		var u5 model.User
-		database.DB.Find(&u5, "user_id=?", ts[i].TeamMember4)
-		ts[i].Member4Name = u5.Username
-	}
+
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": ts})
 }
 func GetTeams(c *gin.Context) { // 根据用户获取用户参与的小组
-	userId := c.DefaultQuery("userId", "")
+	userId := c.Query("userId")
 
-	var ts []model.Team
-	result := database.DB.Find(&ts, "team_leader=? OR team_member1=? OR team_member2=? OR team_member3=? OR team_member4=?",
-		userId, userId, userId, userId, userId)
+	var tus []model.TeamUser
+	result := database.DB.Find(&tus, "user_id=? ", userId)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
 	}
 
-	for i := range ts {
-		var u model.User
-		database.DB.Find(&u, "user_id=?", ts[i].TeamLeader)
-		ts[i].LeaderName = u.Username
+	for i := range tus {
+		var t model.Team
+		database.DB.Find(&t, "team_id=?", tus[i].TeamId)
+		tus[i].TeamName = t.TeamName
 	}
 
 	if result.RowsAffected != 0 {
-		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": ts})
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": tus})
 	} else {
 		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "msg": "没有参与小组~"})
 	}
 }
 func GetTeamInfo(c *gin.Context) {
-	teamId := c.DefaultQuery("teamId", "")
+	teamId := c.Query("teamId")
 
 	var t model.Team
 	result := database.DB.Find(&t, "team_id=?", teamId)
@@ -290,20 +269,5 @@ func GetTeamInfo(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
 	}
-	var u1 model.User
-	database.DB.Find(&u1, "user_id=?", t.TeamLeader)
-	t.LeaderName = u1.Username
-	var u2 model.User
-	database.DB.Find(&u2, "user_id=?", t.TeamMember1)
-	t.Member1Name = u2.Username
-	var u3 model.User
-	database.DB.Find(&u3, "user_id=?", t.TeamMember2)
-	t.Member2Name = u3.Username
-	var u4 model.User
-	database.DB.Find(&u4, "user_id=?", t.TeamMember3)
-	t.Member3Name = u4.Username
-	var u5 model.User
-	database.DB.Find(&u5, "user_id=?", t.TeamMember4)
-	t.Member4Name = u5.Username
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": t})
 }

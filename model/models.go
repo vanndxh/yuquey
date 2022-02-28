@@ -26,24 +26,18 @@ type Article struct {
 }
 
 type Team struct {
-	TeamId       int    `gorm:"primary_key;AUTO_INCREASE"`
-	TeamName     string `gorm:"varchar(10);not null"`
-	TeamNotice   string `gorm:"varchar(40)"`
-	TeamLeader   int    `gorm:"not null"`
-	LeaderName   string `gorm:"-"`
-	LeaderCount  int    `gorm:"not null"`
-	TeamMember1  int    `gorm:""`
-	Member1Name  string `gorm:"-"`
-	Member1Count int    `gorm:"not null"`
-	TeamMember2  int    `gorm:""`
-	Member2Name  string `gorm:"-"`
-	Member2Count int    `gorm:"not null"`
-	TeamMember3  int    `gorm:""`
-	Member3Name  string `gorm:"-"`
-	Member3Count int    `gorm:"not null"`
-	TeamMember4  int    `gorm:""`
-	Member4Name  string `gorm:"-"`
-	Member4Count int    `gorm:"not null"`
+	TeamId     int    `gorm:"primary_key;AUTO_INCREASE"`
+	TeamName   string `gorm:"varchar(10);not null"`
+	TeamNotice string `gorm:"varchar(40)"`
+}
+
+type TeamUser struct {
+	UserId   int    `gorm:"not null"`
+	Username string `gorm:"-"`
+	TeamId   int    `gorm:"not null"`
+	TeamName string `gorm:"-"`
+	Position int    `gorm:"not null"` // 0-leader 1-member
+	Punch    int    `gorm:"not null"`
 }
 
 type Comment struct {
