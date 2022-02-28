@@ -34,12 +34,13 @@ type Team struct {
 }
 
 type TeamUser struct {
-	UserId   int    `gorm:"not null"`
-	Username string `gorm:"-"`
-	TeamId   int    `gorm:"not null"`
-	TeamName string `gorm:"-"`
-	Position int    `gorm:"not null"` // 0-leader 1-member
-	Punch    int    `gorm:"not null"`
+	UserId       int    `gorm:"not null"`
+	Username     string `gorm:"-"`
+	TeamId       int    `gorm:"not null"`
+	TeamName     string `gorm:"-"`
+	Position     int    `gorm:"not null"` // 0-leader 1-member
+	PositionName string `gorm:"-"`
+	Punch        int    `gorm:"not null"`
 }
 
 type Comment struct {

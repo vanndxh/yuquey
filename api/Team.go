@@ -201,7 +201,7 @@ func GetTeamArticles(c *gin.Context) {
 	}
 	// 根据用户找到所有文章
 	var as []model.Article
-	res2 := database.DB.Find(&as, "article_author=?", userIds)
+	res2 := database.DB.Where("article_author IN (?)", userIds).Find(&as)
 	if res2.Error != nil {
 		fmt.Println(res2.Error)
 		return
@@ -219,7 +219,7 @@ func GetTeamMembers(c *gin.Context) {
 	teamId := c.Query("teamId")
 
 	var tus []model.TeamUser
-	res := database.DB.Find(&tus, "team_id=?", teamId)
+	res := database.DB.Order("position").Find(&tus, "team_id=?", teamId)
 	if res.Error != nil {
 		fmt.Println(res.Error)
 		return
@@ -229,6 +229,11 @@ func GetTeamMembers(c *gin.Context) {
 		var u model.User
 		database.DB.Find(&u, "user_id=?", tus[i].UserId)
 		tus[i].Username = u.Username
+		if tus[i].Position == 0 {
+			tus[i].PositionName = "组长"
+		} else {
+			tus[i].PositionName = "组员"
+		}
 	}
 
 	c.JSON(200, gin.H{"status": 200, "data": tus})
@@ -236,6 +241,12 @@ func GetTeamMembers(c *gin.Context) {
 func GetAllTeams(c *gin.Context) {
 	var ts []model.Team
 	database.DB.Order("team_id").Find(&ts)
+
+	for i := range ts {
+		var u model.User
+		database.DB.Find(&u, "user_id=?", ts[i].TeamLeader)
+		ts[i].LeaderName = u.Username
+	}
 
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": ts})
 }
@@ -255,7 +266,7 @@ func GetTeams(c *gin.Context) { // 根据用户获取用户参与的小组
 	}
 	// 根据这些id去获取ts
 	var ts []model.Team
-	res := database.DB.Find(&ts, "team_id=?", teamIds)
+	res := database.DB.Find(&ts, teamIds)
 	if res.Error != nil {
 		c.JSON(400, gin.H{"msg": res.Error.Error()})
 		return
