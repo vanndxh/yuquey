@@ -115,6 +115,7 @@ func GetFollows(c *gin.Context) {
 func GetIsFollowed(c *gin.Context) { // 判断当前是否关注
 	userId := c.Query("userId")
 	upId := c.Query("upId")
+
 	var f model.Follow
 	res := database.DB.Find(&f, "up_id=? AND follower_id=?", upId, userId)
 	if res.Error != nil {

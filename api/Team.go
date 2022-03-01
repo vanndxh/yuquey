@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"time"
 	"yuquey/database"
 	"yuquey/model"
 )
@@ -21,6 +22,7 @@ func CreateTeam(c *gin.Context) {
 	newTeam := model.Team{
 		TeamName:   teamName,
 		TeamLeader: userId,
+		TeamNotice: "暂无~",
 	}
 	err2 := database.DB.Create(&newTeam).Error
 	if err2 != nil {
@@ -28,9 +30,12 @@ func CreateTeam(c *gin.Context) {
 		return
 	}
 	// 小组成员中，加入组长
+	tp, _ := time.ParseDuration("-24h")
+	lastPunchTime := time.Now().Add(tp)
 	newTeamUser := model.TeamUser{
-		UserId: userId,
-		TeamId: newTeam.TeamId,
+		UserId:        userId,
+		TeamId:        newTeam.TeamId,
+		LastPunchTime: lastPunchTime,
 	}
 	database.DB.Create(&newTeamUser)
 	// 返回结果
@@ -56,10 +61,13 @@ func AddTeamUser(c *gin.Context) {
 		return
 	}
 	// 小组成员中，加入组员
+	tp, _ := time.ParseDuration("-24h")
+	lastPunchTime := time.Now().Add(tp)
 	newTeamUser := model.TeamUser{
-		UserId:   newUserId,
-		TeamId:   teamId,
-		Position: 1,
+		UserId:        newUserId,
+		TeamId:        teamId,
+		Position:      1,
+		LastPunchTime: lastPunchTime,
 	}
 	database.DB.Create(&newTeamUser)
 	// 返回结果
@@ -139,10 +147,17 @@ func Punch(c *gin.Context) {
 		fmt.Println(res.Error)
 		return
 	}
-	punchNow := tu.Punch
-	database.DB.Model(&tu).Where("team_id=? AND user_id=?", teamId, userId).Update("punch", punchNow+1)
 
-	c.JSON(200, gin.H{"msg": "ok"})
+	if time.Now().Day() == tu.LastPunchTime.Day() {
+		c.JSON(400, gin.H{"msg": "今天已经打卡！"})
+		return
+	} else {
+		punchNow := tu.Punch
+		database.DB.Model(&tu).Where("team_id=? AND user_id=?", teamId, userId).Update("punch", punchNow+1)
+		database.DB.Model(&tu).Where("team_id=? AND user_id=?", teamId, userId).Update("last_punch_time", time.Now())
+
+		c.JSON(200, gin.H{"msg": "ok"})
+	}
 }
 func QuitTeam(c *gin.Context) {
 	userId, err := strconv.Atoi(c.PostForm("userId"))
