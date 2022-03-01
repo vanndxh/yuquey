@@ -147,8 +147,8 @@ func Punch(c *gin.Context) {
 		fmt.Println(res.Error)
 		return
 	}
-
-	if time.Now().Day() == tu.LastPunchTime.Day() {
+	// 对打卡日期进行判定，今日是否已经打卡
+	if time.Now().Day() == tu.LastPunchTime.Day() && time.Now().Month() == tu.LastPunchTime.Month() && time.Now().Year() == tu.LastPunchTime.Year() {
 		c.JSON(400, gin.H{"msg": "今天已经打卡！"})
 		return
 	} else {

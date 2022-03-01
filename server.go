@@ -16,6 +16,7 @@ func main() {
 
 	//apiV1
 	apiV1 := r.Group("/api/V1")
+	apiV1.GET("/search", api.Search)
 	//ws := r.Group("/ws")
 
 	// user
@@ -35,7 +36,6 @@ func main() {
 	V1article.DELETE("/deleteArticle", api.DeleteArticle)
 	V1article.POST("/updateArticle", api.UpdateArticle)
 	V1article.POST("/transTrash", api.TransTrash)
-	V1article.GET("/searchArticle", api.SearchArticle)
 	V1article.GET("/getHotArticle", api.GetHotArticle)
 	V1article.GET("/getAllArticles", api.GetAllArticles)
 

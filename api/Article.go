@@ -5,8 +5,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"time"
 	"yuquey/database"
 	"yuquey/model"
+	"yuquey/util"
 )
 
 func CreateArticle(c *gin.Context) {
@@ -38,6 +40,7 @@ func CreateArticle(c *gin.Context) {
 		ArticleName:    articleName,
 		ArticleContent: articleContent,
 		ArticleAuthor:  articleAuthor,
+		Time:           time.Now(),
 	}
 	err2 := database.DB.Create(&newArticle).Error
 	if err2 != nil {
@@ -151,22 +154,6 @@ func GetArticles(c *gin.Context) { // 根据用户获取
 	}
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": as})
 }
-func SearchArticle(c *gin.Context) { // 根据搜索内容模糊查询
-	searchValue := c.DefaultQuery("searchValue", "")
-
-	var a []model.Article
-	result := database.DB.Order("hot desc").Find(&a, "article_name like ?", "%"+searchValue+"%")
-	if result.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
-		return
-	}
-
-	if result.RowsAffected != 0 {
-		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": a})
-	} else {
-		c.JSON(http.StatusOK, gin.H{"status": 200, "data": "none"})
-	}
-}
 func GetArticleInfo(c *gin.Context) {
 	// 获取数据
 	var a model.Article
@@ -177,12 +164,16 @@ func GetArticleInfo(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
 	}
+	// 获取作者name
 	var u model.User
 	res := database.DB.Find(&u, "user_id=?", a.ArticleAuthor)
 	if res.Error != nil {
 		fmt.Println(res.Error)
 		return
 	}
+	// 浏览量
+	viewNow := a.ViewAmount
+	database.DB.Model(&a).Where("article_id=?", articleId).Update("view_amount", viewNow+1)
 	// 返回表单
 	if result.RowsAffected != 0 {
 		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": a, "authorName": u.Username})
@@ -191,16 +182,17 @@ func GetArticleInfo(c *gin.Context) {
 	}
 }
 func GetHotArticle(c *gin.Context) {
-	// 获取数据
-	var a []model.Article
+	// 计算最新hot
+	util.CalculateHot()
 	// 查找对应文章
-	result := database.DB.Order("hot desc").Find(&a, "is_in_trash=?", 0)
+	var ass []model.Article
+	result := database.DB.Order("hot desc").Find(&ass, "is_in_trash=?", 0)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
 	}
 	// 返回表单
-	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": a})
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": ass})
 }
 func GetAllArticles(c *gin.Context) {
 	var as []model.Article

@@ -81,14 +81,6 @@ func HandleLike(c *gin.Context) {
 		database.DB.Model(&a).Update("like_amount", likeNow2-1)
 	}
 
-	// 给文章热度
-	hotNow := a.Hot
-	if handle == 0 {
-		database.DB.Model(&a).Update("hot", hotNow+1)
-	} else {
-		database.DB.Model(&a).Update("hot", hotNow-1)
-	}
-
 	// 如果是点赞，发消息给作者
 	if handle == 0 && a.ArticleAuthor != userId {
 		newMessage := model.Message{

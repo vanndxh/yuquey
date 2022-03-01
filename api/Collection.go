@@ -47,7 +47,6 @@ func HandleCollection(c *gin.Context) {
 			return
 		}
 	}
-
 	// 文章收藏数
 	var a model.Article
 	res := database.DB.Find(&a, "article_id=?", articleId)
@@ -61,15 +60,6 @@ func HandleCollection(c *gin.Context) {
 	} else {
 		database.DB.Model(&a).Update("collection_amount", starNow-1)
 	}
-
-	// 给文章热度
-	hotNow := a.Hot
-	if handle == 0 {
-		database.DB.Model(&a).Update("hot", hotNow+3)
-	} else {
-		database.DB.Model(&a).Update("hot", hotNow-3)
-	}
-
 	// 如果是收藏，发消息给作者
 	if handle == 0 && a.ArticleAuthor != userId {
 		newMessage := model.Message{
@@ -86,7 +76,6 @@ func HandleCollection(c *gin.Context) {
 			return
 		}
 	}
-
 	// 返回结果
 	c.JSON(200, gin.H{
 		"msg": "成功！",

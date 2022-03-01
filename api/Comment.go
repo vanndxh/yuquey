@@ -43,8 +43,6 @@ func CreateComment(c *gin.Context) {
 		fmt.Println(res.Error)
 		return
 	}
-	hotNow := a.Hot
-	database.DB.Model(&a).Update("hot", hotNow+2)
 
 	if a.ArticleAuthor != userId {
 		newMessage := model.Message{
@@ -82,8 +80,6 @@ func DeleteComment(c *gin.Context) {
 		fmt.Println(res2.Error)
 		return
 	}
-	hotNow := a.Hot
-	database.DB.Model(&a).Update("hot", hotNow-2)
 
 	// 删除操作
 	result := database.DB.Delete(&cc, "comment_id=?", commentId)
