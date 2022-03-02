@@ -30,14 +30,14 @@ func Search(c *gin.Context) { // 根据搜索内容模糊查询
 		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": as})
 	} else if handle == "1" {
 		var us []model.User
-		res := database.DB.Find(&us, "username like ?", "%"+searchValue+"%")
+		res := database.DB.Order("user_id").Find(&us, "username like ?", "%"+searchValue+"%")
 		if res.Error != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": res.Error.Error()})
 		}
 		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": us})
 	} else if handle == "2" {
 		var ts []model.Team
-		res := database.DB.Find(&ts, "team_name like ?", "%"+searchValue+"%")
+		res := database.DB.Order("team_id").Find(&ts, "team_name like ?", "%"+searchValue+"%")
 		if res.Error != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": res.Error.Error()})
 			return

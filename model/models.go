@@ -41,7 +41,7 @@ type TeamUser struct {
 	Username      string    `gorm:"-"`
 	TeamId        int       `gorm:"not null"`
 	TeamName      string    `gorm:"-"`
-	Position      int       `gorm:"not null"` // 0-leader 1-member
+	Position      int       `gorm:"not null"` // 0-leader 1-manager 2-member
 	PositionName  string    `gorm:"-"`
 	Punch         int       `gorm:"not null"`
 	LastPunchTime time.Time `gorm:"not null"`

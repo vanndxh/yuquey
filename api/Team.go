@@ -41,37 +41,93 @@ func CreateTeam(c *gin.Context) {
 	// 返回结果
 	c.JSON(200, gin.H{"msg": "小组创建成功！"})
 }
-func AddTeamUser(c *gin.Context) {
+func HandleTeamUser(c *gin.Context) {
+	// 获取数据
+	teamId, err := strconv.Atoi(c.PostForm("teamId"))
+	if err != nil {
+		c.JSON(400, gin.H{})
+		return
+	}
+	teamUser, err2 := strconv.Atoi(c.PostForm("teamUser"))
+	if err2 != nil {
+		c.JSON(400, gin.H{})
+		return
+	}
+	handle := c.PostForm("handle")
+
+	if handle == "0" {
+		// 判断是否已经存在
+		var t model.TeamUser
+		result := database.DB.Find(&t, "team_id=? AND user_id=?", teamId, teamUser)
+		if result.RowsAffected != 0 {
+			c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": "小组成员已经存在！"})
+			return
+		}
+		// 小组成员中，加入组员
+		tp, _ := time.ParseDuration("-24h")
+		lastPunchTime := time.Now().Add(tp)
+		newTeamUser := model.TeamUser{
+			UserId:        teamUser,
+			TeamId:        teamId,
+			Position:      2,
+			LastPunchTime: lastPunchTime,
+		}
+		database.DB.Create(&newTeamUser)
+	} else if handle == "1" {
+		// 删除小组成员
+		var tu model.TeamUser
+		res := database.DB.Delete(&tu, "team_id=? AND user_id=?", teamId, teamUser)
+		if res.Error != nil {
+			c.JSON(400, gin.H{"msg": res.Error.Error()})
+		}
+	}
+
+	// 返回结果
+	c.JSON(200, gin.H{"msg": "ok！"})
+}
+func HandleManager(c *gin.Context) {
 	// 获取数据
 	teamId, err := strconv.Atoi(c.PostForm("teamId"))
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	newUserId, err2 := strconv.Atoi(c.PostForm("newUserId"))
+	teamUser, err2 := strconv.Atoi(c.PostForm("teamUser"))
 	if err2 != nil {
 		fmt.Println(err2)
 		return
 	}
-	// 判断是否已经存在
-	var t model.TeamUser
-	result := database.DB.Find(&t, "team_id=? AND user_id=?", teamId, newUserId)
-	if result.RowsAffected != 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": "小组成员已经存在！"})
+	handle := c.PostForm("handle")
+
+	// 判断用户是否在小组内
+	var tu model.TeamUser
+	res2 := database.DB.Find(&tu, "team_id=? AND user_id=?", teamId, teamUser)
+	if res2.Error != nil {
+		fmt.Println(res2.Error.Error())
 		return
 	}
-	// 小组成员中，加入组员
-	tp, _ := time.ParseDuration("-24h")
-	lastPunchTime := time.Now().Add(tp)
-	newTeamUser := model.TeamUser{
-		UserId:        newUserId,
-		TeamId:        teamId,
-		Position:      1,
-		LastPunchTime: lastPunchTime,
+
+	if handle == "0" {
+		// 判断管理员有没有满
+		var tut model.TeamUser
+		res := database.DB.Find(&tut, "team_id=? AND position=?", teamId, 1)
+		if res.RowsAffected >= 10 {
+			c.JSON(400, gin.H{"msg": "管理员已满"})
+		}
+		// 判断是否已经是管理员
+		if tu.Position == 1 {
+			c.JSON(400, gin.H{"msg": "用户已经是管理"})
+		}
+		database.DB.Model(&tu).Where("team_id=? AND user_id=?", teamId, teamUser).Update("position", 1)
+		c.JSON(200, gin.H{"msg": "ok！"})
+	} else if handle == "1" {
+		// 判断是否是管理员
+		if tu.Position == 2 {
+			c.JSON(400, gin.H{"msg": "用户不是管理，无法撤职"})
+		}
+		database.DB.Model(&tu).Where("team_id=? AND user_id=?", teamId, teamUser).Update("position", 2)
+		c.JSON(200, gin.H{"msg": "ok！"})
 	}
-	database.DB.Create(&newTeamUser)
-	// 返回结果
-	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "小组成员添加成功！"})
 }
 
 func DeleteTeam(c *gin.Context) {
@@ -93,18 +149,6 @@ func DeleteTeam(c *gin.Context) {
 	}
 	// 返回结果
 	c.JSON(200, gin.H{"msg": "小组删除成功！"})
-}
-func DeleteTeamUser(c *gin.Context) {
-	teamId := c.Query("teamId")
-	teamUser := c.Query("teamUser")
-
-	var tu model.TeamUser
-	res := database.DB.Delete(&tu, "team_id=? AND user_id=?", teamId, teamUser)
-	if res.Error != nil {
-		c.JSON(400, gin.H{"msg": res.Error.Error()})
-	}
-
-	c.JSON(200, gin.H{"msg": "ok！"})
 }
 
 func UpdateTeamInfo(c *gin.Context) {
@@ -246,6 +290,8 @@ func GetTeamMembers(c *gin.Context) {
 		tus[i].Username = u.Username
 		if tus[i].Position == 0 {
 			tus[i].PositionName = "组长"
+		} else if tus[i].Position == 1 {
+			tus[i].PositionName = "管理员"
 		} else {
 			tus[i].PositionName = "组员"
 		}

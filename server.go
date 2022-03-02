@@ -46,13 +46,13 @@ func main() {
 	V1team.DELETE("/deleteTeam", api.DeleteTeam)
 	V1team.POST("/updateTeamInfo", api.UpdateTeamInfo)
 	V1team.GET("/getTeamInfo", api.GetTeamInfo)
-	V1team.POST("/addTeamUser", api.AddTeamUser)
+	V1team.POST("/handleTeamUser", api.HandleTeamUser)
 	V1team.POST("/punch", api.Punch)
 	V1team.POST("/quitTeam", api.QuitTeam)
 	V1team.GET("/getTeamArticles", api.GetTeamArticles)
 	V1team.GET("/getTeamMembers", api.GetTeamMembers)
 	V1team.GET("/getAllTeams", api.GetAllTeams)
-	V1team.DELETE("/deleteTeamUser", api.DeleteTeamUser)
+	V1team.POST("/handleManager", api.HandleManager)
 
 	// comment
 	V1comment := apiV1.Group("/comment")

@@ -145,7 +145,7 @@ func UpdateUserInfo(c *gin.Context) {
 		return
 	}
 	// update
-	database.DB.Model(&u).Update("user_name", username)
+	database.DB.Model(&u).Update("username", username)
 	database.DB.Model(&u).Update("password", password)
 	database.DB.Model(&u).Update("user_info", userInfo)
 	// 返回结果
