@@ -99,6 +99,8 @@ func UpdateArticle(c *gin.Context) {
 	}
 	articleName := c.PostForm("newArticleName")
 	articleContent := c.PostForm("newArticleContent")
+	secret, _ := strconv.Atoi(c.PostForm("newSecret"))
+
 	// 判断合理性
 	if len(articleName) == 0 {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
@@ -114,8 +116,9 @@ func UpdateArticle(c *gin.Context) {
 		return
 	}
 	// update
-	database.DB.Model(&a).Update("article_name", articleName)
-	database.DB.Model(&a).Update("article_content", articleContent)
+	database.DB.Model(&a).Where("article_id=?", articleId).Update("article_name", articleName)
+	database.DB.Model(&a).Where("article_id=?", articleId).Update("article_content", articleContent)
+	database.DB.Model(&a).Where("article_id=?", articleId).Update("secret", secret)
 	// 返回结果
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "文章修改成功！"})
 }
