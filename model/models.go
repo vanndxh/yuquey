@@ -15,8 +15,8 @@ type User struct {
 
 type Article struct {
 	ArticleId        int       `gorm:"primary_key;AUTO_INCREASE"`
-	ArticleName      string    `gorm:"varchar(10);not null"`
-	ArticleContent   string    `gorm:"varchar(200)"`
+	ArticleName      string    `gorm:"varchar(15);not null"`
+	ArticleContent   string    `gorm:"varchar(2000)"`
 	ArticleAuthor    int       `gorm:"not null"`
 	AuthorName       string    `gorm:"-"`
 	Secret           int       `gorm:"not null"`
