@@ -17,7 +17,7 @@ func Search(c *gin.Context) { // 根据搜索内容模糊查询
 		util.CalculateHot()
 		// 模糊搜索文章名
 		var as []model.Article
-		result := database.DB.Order("hot desc").Find(&as, "article_name like ?", "%"+searchValue+"%")
+		result := database.DB.Where("secret=?", 0).Order("hot desc").Find(&as, "article_name like ?", "%"+searchValue+"%")
 		if result.Error != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 			return

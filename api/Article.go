@@ -189,7 +189,7 @@ func GetHotArticle(c *gin.Context) {
 	util.CalculateHot()
 	// 查找对应文章
 	var ass []model.Article
-	result := database.DB.Order("hot desc").Find(&ass, "is_in_trash=?", 0)
+	result := database.DB.Where("secret=?", 0).Order("hot desc").Find(&ass, "is_in_trash=?", 0)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
