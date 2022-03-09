@@ -36,8 +36,9 @@ func main() {
 	V1article.DELETE("/deleteArticle", api.DeleteArticle)
 	V1article.POST("/updateArticle", api.UpdateArticle)
 	V1article.POST("/transTrash", api.TransTrash)
-	V1article.GET("/getHotArticle", api.GetHotArticle)
+	V1article.GET("/getHotArticles", api.GetHotArticles)
 	V1article.GET("/getAllArticles", api.GetAllArticles)
+	V1article.GET("/getFollowArticles", api.GetFollowArticles)
 
 	// team
 	V1team := apiV1.Group("/team")

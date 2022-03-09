@@ -184,7 +184,7 @@ func GetArticleInfo(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "msg": "This article is not exist."})
 	}
 }
-func GetHotArticle(c *gin.Context) {
+func GetHotArticles(c *gin.Context) {
 	// 计算最新hot
 	util.CalculateHot()
 	// 查找对应文章
@@ -193,6 +193,12 @@ func GetHotArticle(c *gin.Context) {
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
+	}
+	// get name
+	for i := range ass {
+		var u model.User
+		database.DB.Find(&u, "user_id=?", ass[i].ArticleAuthor)
+		ass[i].AuthorName = u.Username
 	}
 	// 返回表单
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": ass})
@@ -206,4 +212,27 @@ func GetAllArticles(c *gin.Context) {
 		as[i].AuthorName = u.Username
 	}
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": as})
+}
+func GetFollowArticles(c *gin.Context) {
+	userId := c.Query("userId")
+	// 确认关注了哪些人
+	var fs []model.Follow
+	database.DB.Find(&fs, "follower_id=?", userId)
+	upIds := make([]int, len(fs))
+	for i := range fs {
+		upIds[i] = fs[i].UpId
+	}
+	// 去获取关注这些人的所有文章，按time排序
+	var as []model.Article
+	res := database.DB.Order("time desc").Find(&as, "article_author IN (?)", upIds)
+	if res.Error != nil {
+		return
+	}
+	// get name
+	for i := range as {
+		var u model.User
+		database.DB.Find(&u, "user_id=?", as[i].ArticleAuthor)
+		as[i].AuthorName = u.Username
+	}
+	c.JSON(200, gin.H{"data": as})
 }
