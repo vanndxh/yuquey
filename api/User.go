@@ -5,6 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"strconv"
+	"time"
 	"yuquey/database"
 	"yuquey/model"
 )
@@ -150,6 +152,37 @@ func UpdateUserInfo(c *gin.Context) {
 	database.DB.Model(&u).Update("user_info", userInfo)
 	// 返回结果
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "success", "data": "用户个人信息修改成功！"})
+}
+func RenewVip(c *gin.Context) {
+	// 获取参数
+	userId, _ := strconv.Atoi(c.PostForm("userId"))
+	code := c.PostForm("code")
+	// 找到user
+	var u model.User
+	database.DB.Find(&u, "user_id=?", userId)
+	// 准备各种时间段的duration
+	tp, _ := time.ParseDuration("720h")
+	// 判定code进行操作
+	if code == "xiaoheihaoshuai" {
+		if u.Vip.Before(time.Now()) {
+			newVip := time.Now().Add(tp)
+			res := database.DB.Model(&u).Where("user_id=?", userId).Update("vip", newVip)
+			if res.Error != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": res.Error.Error()})
+				return
+			}
+		} else {
+			newVip := u.Vip.Add(tp)
+			res := database.DB.Model(&u).Where("user_id=?", userId).Update("vip", newVip)
+			if res.Error != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": res.Error.Error()})
+				return
+			}
+		}
+		c.JSON(200, gin.H{"msg": "ok"})
+	} else {
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest})
+	}
 }
 
 func GetUserInfo(c *gin.Context) {

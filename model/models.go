@@ -3,14 +3,16 @@ package model
 import "time"
 
 type User struct {
-	UserId         int    `gorm:"primary_key;AUTO_INCREASE"`
-	Username       string `gorm:"varchar(10);not null"`
-	Password       string `gorm:"not null"`
-	UserInfo       string `gorm:"varchar(60)"`
-	ArticleAmount  int    `gorm:"not null"`
-	LikeAmount     int    `gorm:"not null"`
-	FollowAmount   int    `gorm:"not null"`
-	FollowerAmount int    `gorm:"not null"`
+	UserId         int       `gorm:"primary_key;AUTO_INCREASE"`
+	Username       string    `gorm:"varchar(10);not null"`
+	Password       string    `gorm:"not null"`
+	UserInfo       string    `gorm:"varchar(60)"`
+	Vip            time.Time `gorm:"not null"`
+	Authentication string    `gorm:""`
+	ArticleAmount  int       `gorm:"not null"`
+	LikeAmount     int       `gorm:"not null"`
+	FollowAmount   int       `gorm:"not null"`
+	FollowerAmount int       `gorm:"not null"`
 }
 
 type Article struct {
@@ -25,7 +27,7 @@ type Article struct {
 	LikeAmount       int       `gorm:"not null"`
 	CollectionAmount int       `gorm:"not null"`
 	IsInTrash        int       `gorm:"not null"` // 0-not 1-yes
-	Hot              int       `gorm:"not null"`
+	Hot              float64   `gorm:"not null"`
 }
 
 type Team struct {

@@ -64,13 +64,10 @@ func HandleTeamUser(c *gin.Context) {
 			return
 		}
 		// 小组成员中，加入组员
-		tp, _ := time.ParseDuration("-24h")
-		lastPunchTime := time.Now().Add(tp)
 		newTeamUser := model.TeamUser{
-			UserId:        teamUser,
-			TeamId:        teamId,
-			Position:      2,
-			LastPunchTime: lastPunchTime,
+			UserId:   teamUser,
+			TeamId:   teamId,
+			Position: 2,
 		}
 		database.DB.Create(&newTeamUser)
 	} else if handle == "1" {
