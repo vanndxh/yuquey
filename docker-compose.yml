@@ -3,7 +3,7 @@ version: "3.7"
 services:
   pg:
     image: postgres:alpine  # 基础镜像
-    container_name: "fund_postgres"  # 容器名称
+    container_name: "xhw_postgres"  # 容器名称
     ports:
       - "5432:5432"
     volumes:
@@ -13,7 +13,7 @@ services:
       - POSTGRES_USER=postgres  # 数据库用户
       - POSTGRES_PASSWORD=vanndxh1101  # 数据库密码
   go:
-    container_name: "fund_go"
+    container_name: "xhw_go"
     build: .  # Dockerfile文件目录
     restart: always
     ports:

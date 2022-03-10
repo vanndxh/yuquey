@@ -7,17 +7,18 @@ import (
 	"yuquey/model"
 )
 
+// 生产环境
+const (
+	postgresHost = "xhw_postgres:1101"
+)
+
 var DB *gorm.DB
 
 func init() {
+	// postgresDB
 	var err error
-	host := "localhost"
-	port := 1101
-	database := "postgres"
-	username := "postgres"
-	password := "pgsql1101"
-	psgInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		host, port, username, password, database)
+	psgInfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+		postgresHost, "postgres", "pgsql1101", "postgres")
 	DB, err = gorm.Open("postgres", psgInfo)
 	DB.LogMode(true)
 	if err != nil {
