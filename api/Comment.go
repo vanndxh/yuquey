@@ -109,6 +109,8 @@ func GetArticleComment(c *gin.Context) {
 		var u model.User
 		database.DB.Find(&u, "user_id=?", uid)
 		cc[i].Username = u.Username
+		cc[i].UserVip = u.Vip
+		cc[i].UserAuth = u.Authentication
 	}
 
 	c.JSON(200, gin.H{"status": 200, "data": cc})

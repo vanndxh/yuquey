@@ -28,6 +28,7 @@ func main() {
 	V1user.GET("/getAllUsers", api.GetAllUsers)
 	V1user.DELETE("/deleteUser", api.DeleteUser)
 	V1user.POST("/renewVip", api.RenewVip)
+	V1user.POST("/addAuth", api.AddAuth)
 
 	// article
 	V1article := apiV1.Group("/article")

@@ -25,6 +25,9 @@ func CalculateHot() {
 		if u.Vip.After(time.Now()) {
 			author *= 1.5 // VIP用户权重再1.5倍
 		}
+		if len(u.Authentication) != 0 {
+			author *= 1.5 // 如果是认证号，再再1.5
+		}
 		// 汇总计算
 		newHot := 1.0 * score * author / days
 		// 更新

@@ -50,12 +50,14 @@ type TeamUser struct {
 }
 
 type Comment struct {
-	CommentId      int    `gorm:"primary_key;AUTO_INCREASE"`
-	UserId         int    `gorm:"not null"`
-	Username       string `gorm:"-"`
-	ArticleId      int    `gorm:"not null"`
-	ArticleName    string `gorm:"-"`
-	CommentContent string `gorm:"not null"`
+	CommentId      int       `gorm:"primary_key;AUTO_INCREASE"`
+	UserId         int       `gorm:"not null"`
+	Username       string    `gorm:"-"`
+	UserVip        time.Time `gorm:"-"`
+	UserAuth       string    `gorm:"-"`
+	ArticleId      int       `gorm:"not null"`
+	ArticleName    string    `gorm:"-"`
+	CommentContent string    `gorm:"not null"`
 }
 
 type Message struct {

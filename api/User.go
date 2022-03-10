@@ -184,6 +184,25 @@ func RenewVip(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest})
 	}
 }
+func AddAuth(c *gin.Context) {
+	authId, err := strconv.Atoi(c.PostForm("authId"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	authContent := c.PostForm("authContent")
+	if len(authContent) == 0 {
+		c.JSON(400, gin.H{"msg": "内容不能为空！"})
+		return
+	}
+	var u model.User
+	res := database.DB.Model(&u).Where("user_id=?", authId).Update("authentication", authContent)
+	if res.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": res.Error.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"msg": "ok"})
+}
 
 func GetUserInfo(c *gin.Context) {
 	userId := c.DefaultQuery("userId", "")
