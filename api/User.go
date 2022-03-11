@@ -208,6 +208,7 @@ func ReadNotice(c *gin.Context) {
 
 	var u model.User
 	database.DB.Model(&u).Where("user_id=?", userId).Update("read_notice", 1)
+	c.JSON(200, gin.H{"msg": "ok"})
 }
 
 func GetUserInfo(c *gin.Context) {

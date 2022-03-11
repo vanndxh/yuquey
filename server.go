@@ -3,9 +3,15 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"yuquey/api"
+	"yuquey/database"
+	"yuquey/model"
 )
 
 func main() {
+	database.DB.AutoMigrate(&model.User{}, &model.Article{}, &model.Timeline{}, &model.SupportCount{}, &model.Like{},
+		&model.Collection{}, &model.Feedback{}, &model.Team{}, &model.Comment{}, &model.Follow{}, &model.Message{},
+		&model.TeamUser{}, &model.Notice{})
+
 	r := gin.Default()
 
 	//apiV1
@@ -93,6 +99,11 @@ func main() {
 	// supportCount
 	V1supportCount := apiV1.Group("/supportCount")
 	V1supportCount.GET("/getSupportCount", api.GetSupportCount)
+
+	// notice
+	V1notice := apiV1.Group("/notice")
+	V1notice.GET("/getNotice", api.GetNotice)
+	V1notice.POST("/changeNotice", api.ChangeNotice)
 
 	// feedback
 	V1feedback := apiV1.Group("/feedback")
