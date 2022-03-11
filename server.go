@@ -86,6 +86,8 @@ func main() {
 	// timeline
 	V1timeline := apiV1.Group("/timeline")
 	V1timeline.GET("/getTimeline", api.GetTimeline)
+	V1timeline.POST("/addTimeline", api.AddTimeline)
+	V1timeline.DELETE("/deleteTimeline", api.DeleteTimeline)
 
 	// follow
 	V1follow := apiV1.Group("/follow")
@@ -100,6 +102,8 @@ func main() {
 	// feedback
 	V1feedback := apiV1.Group("/feedback")
 	V1feedback.POST("/submitFeedback", api.SubmitFeedback)
+	V1feedback.GET("/getFeedbacks", api.GetFeedbacks)
+	V1feedback.DELETE("/deleteFeedback", api.DeleteFeedback)
 
 	panic(r.Run("0.0.0.0:8088"))
 }

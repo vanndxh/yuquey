@@ -98,17 +98,17 @@ func GetFavorite(c *gin.Context) { // 根据用户获取所有收藏的文章
 	}
 	var as []model.Article
 	result := database.DB.Find(&as, idSlice)
+	if result.Error != nil {
+		fmt.Println(result.Error)
+		return
+	}
 
 	for i := range as {
 		var u model.User
 		database.DB.Find(&u, "user_id=?", as[i].ArticleAuthor)
 		as[i].AuthorName = u.Username
 	}
-	if result.RowsAffected != 0 {
-		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": as})
-	} else {
-		c.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "msg": "收藏夹是空的！"})
-	}
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": as})
 }
 func GetIsCollected(c *gin.Context) {
 	userId := c.DefaultQuery("userId", "")

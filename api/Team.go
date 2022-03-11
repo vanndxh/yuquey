@@ -65,9 +65,10 @@ func HandleTeamUser(c *gin.Context) {
 		}
 		// 小组成员中，加入组员
 		newTeamUser := model.TeamUser{
-			UserId:   teamUser,
-			TeamId:   teamId,
-			Position: 2,
+			UserId:        teamUser,
+			TeamId:        teamId,
+			Position:      2,
+			LastPunchTime: time.Now(),
 		}
 		database.DB.Create(&newTeamUser)
 	} else if handle == "1" {

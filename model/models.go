@@ -100,5 +100,7 @@ type SupportCount struct {
 }
 
 type Feedback struct {
+	FeedbackId   int    `gorm:"primary_key;AUTO_INCREASE"`
 	FeedbackInfo string `gorm:"varchar(200);not null"`
+	UserId       int    `gorm:"not null"`
 }
