@@ -101,7 +101,8 @@ type SupportCount struct {
 }
 
 type Notice struct {
-	NoticeContent string `gorm:"not null"`
+	NoticeContent string    `gorm:"not null"`
+	Time          time.Time `gorm:""`
 }
 
 type Feedback struct {
