@@ -13,6 +13,7 @@ type User struct {
 	LikeAmount     int       `gorm:"not null"`
 	FollowAmount   int       `gorm:"not null"`
 	FollowerAmount int       `gorm:"not null"`
+	ReadNotice     int       `gorm:"not null"`
 }
 
 type Article struct {
@@ -97,6 +98,10 @@ type Collection struct {
 
 type SupportCount struct {
 	Count int `gorm:"not null"`
+}
+
+type Notice struct {
+	NoticeContent string `gorm:"not null"`
 }
 
 type Feedback struct {

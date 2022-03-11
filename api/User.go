@@ -203,6 +203,12 @@ func AddAuth(c *gin.Context) {
 	}
 	c.JSON(200, gin.H{"msg": "ok"})
 }
+func ReadNotice(c *gin.Context) {
+	userId, _ := strconv.Atoi(c.PostForm("userId"))
+
+	var u model.User
+	database.DB.Model(&u).Where("user_id=?", userId).Update("read_notice", 1)
+}
 
 func GetUserInfo(c *gin.Context) {
 	userId := c.DefaultQuery("userId", "")

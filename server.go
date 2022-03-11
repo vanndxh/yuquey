@@ -3,15 +3,9 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"yuquey/api"
-	"yuquey/database"
-	"yuquey/model"
 )
 
 func main() {
-	database.DB.AutoMigrate(&model.User{}, &model.Article{}, &model.Timeline{}, &model.SupportCount{}, &model.Like{},
-		&model.Collection{}, &model.Feedback{}, &model.Team{}, &model.Comment{}, &model.Follow{}, &model.Message{},
-		&model.TeamUser{})
-
 	r := gin.Default()
 
 	//apiV1
@@ -29,6 +23,7 @@ func main() {
 	V1user.DELETE("/deleteUser", api.DeleteUser)
 	V1user.POST("/renewVip", api.RenewVip)
 	V1user.POST("/addAuth", api.AddAuth)
+	V1user.POST("/readNotice", api.ReadNotice)
 
 	// article
 	V1article := apiV1.Group("/article")
