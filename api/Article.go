@@ -20,6 +20,7 @@ func CreateArticle(c *gin.Context) {
 		fmt.Println(err)
 		return
 	}
+
 	// 判断数据合理性
 	if len(articleName) == 0 {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{

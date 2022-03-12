@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
+	"log"
+	"strconv"
+	"time"
 	"yuquey/model"
 )
 
@@ -59,6 +62,38 @@ func init() {
 			fmt.Println(err)
 			return
 		}
+	}
+
+	// 初始化管理员账号
+	adminUser := model.User{
+		Username:       "Vanndxh",
+		Password:       "123456",
+		UserInfo:       "暂无~",
+		Authentication: "网站创始人",
+	}
+	err2 := DB.Create(&adminUser).Error
+	if err2 != nil {
+		log.Println(err2)
+	}
+
+	// 创建第一篇文章留用
+	firstArticle := model.Article{
+		ArticleName:    "小黑屋使用攻略",
+		ArticleContent: "等创完了再来写~",
+		ArticleAuthor:  1,
+		Time:           time.Now(),
+	}
+	DB.Create(&firstArticle)
+
+	// 初始化文章库
+	var i = 0
+	for i = 0; i < 30; i++ {
+		newArticle := model.Article{
+			ArticleName:    "初始化文章" + strconv.Itoa(i),
+			ArticleContent: "本文章为初始化需要，没有实际内容，没有作者！",
+			ArticleAuthor:  99999,
+		}
+		DB.Create(&newArticle)
 	}
 
 }

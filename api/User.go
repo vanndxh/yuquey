@@ -86,15 +86,11 @@ func Login(c *gin.Context) {
 	// 查找用户是否存在并验证密码
 	result := database.DB.Find(&u, "user_id=? AND password=?", userId, password)
 	if result.Error != nil {
-		c.JSON(http.StatusNotFound, gin.H{"status": 404, "msg": "账号或密码错误！"})
+		c.JSON(200, gin.H{"status": 200, "msg": "账号或密码错误！", "data": false})
 		return
 	}
 	// 返回结果
-	if result.RowsAffected != 0 {
-		c.JSON(http.StatusOK, gin.H{"status": 200, "msg": "登录成功！"})
-	} else {
-		c.JSON(http.StatusNotFound, gin.H{"status": 404, "msg": "账号或密码错误！"})
-	}
+	c.JSON(http.StatusOK, gin.H{"status": 200, "msg": "登录成功！", "data": true})
 }
 
 func DeleteUser(c *gin.Context) {
