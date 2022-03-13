@@ -9,6 +9,7 @@ import (
 	"time"
 	"yuquey/database"
 	"yuquey/model"
+	"yuquey/util"
 )
 
 func Register(c *gin.Context) {
@@ -28,7 +29,7 @@ func Register(c *gin.Context) {
 		fmt.Println(ok3, rePassword, "3")
 		return
 	}
-	// 判断合理性
+	// 判断密码合理性
 	if len(password) == 0 {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"code": 422,
@@ -41,11 +42,10 @@ func Register(c *gin.Context) {
 			"msg":  "密码不能小于6位！",
 		})
 		return
-	}
-	if len(username) == 0 {
+	} else if util.IndexOf(password, " ") != -1 || util.IndexOf(password, " ") != -1 {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"code": 422,
-			"msg":  "用户名不能为空！",
+			"msg":  "密码不能含有空格！",
 		})
 		return
 	}
@@ -53,6 +53,20 @@ func Register(c *gin.Context) {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"code": 422,
 			"msg":  "两次输入密码需一致！",
+		})
+		return
+	}
+	// 判断用户名合理性
+	if len(username) == 0 {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"code": 422,
+			"msg":  "用户名不能为空！",
+		})
+		return
+	} else if util.IndexOf(username, " ") != -1 || util.IndexOf(username, " ") != -1 {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"code": 422,
+			"msg":  "用户名不能含有空格！",
 		})
 		return
 	}

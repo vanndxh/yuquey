@@ -37,3 +37,12 @@ func CalculateHot() {
 		}
 	}
 }
+
+func IndexOf(array string, e interface{}) int {
+	for i := range array {
+		if e == array[i] {
+			return i
+		}
+	}
+	return -1
+}

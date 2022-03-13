@@ -68,7 +68,7 @@ type Message struct {
 	Op        int       `gorm:"not null"`
 	ArticleId int       `gorm:""`
 	Content   string    `gorm:"-"`
-	Read      int       `gorm:"not null"`
+	Read      int       `gorm:"not null"` // 1-no 2-yes
 	Time      time.Time `gorm:"not null"`
 }
 
