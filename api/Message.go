@@ -5,9 +5,34 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"time"
 	"yuquey/database"
 	"yuquey/model"
 )
+
+func SendMessage(c *gin.Context) {
+	userId, err := strconv.Atoi(c.PostForm("userId"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	messageContent := c.PostForm("messageContent")
+
+	newMessage := model.Message{
+		Content: messageContent,
+		Read:    1,
+		Time:    time.Now(),
+		UserId:  userId,
+		Type:    5,
+	}
+
+	res := database.DB.Create(&newMessage).Error
+	if res != nil {
+		fmt.Println(res)
+		return
+	}
+	c.JSON(200, gin.H{"msg": "ok"})
+}
 
 func ReadMessage(c *gin.Context) {
 	messageId, err := strconv.Atoi(c.PostForm("messageId"))
@@ -64,7 +89,7 @@ func GetMessages(c *gin.Context) { // 根据用户获取消息
 	var ms []model.Message
 	// 选择筛选模式
 	// handle1: 0-all 1-no 2-yes
-	// handle2: 0-all 1-like 2-collection 3-comment 4-follow
+	// handle2: 0-all 1-like 2-collection 3-comment 4-follow 5-other
 	if handle1 == "0" && handle2 == "0" {
 		res := database.DB.Order("time desc").Find(&ms, "user_id=?", userId)
 		if res.Error != nil {
@@ -107,7 +132,7 @@ func GetMessages(c *gin.Context) { // 根据用户获取消息
 
 		if ms[i].Type == 4 {
 			ms[i].Content = "用户" + op.Username + typeName + "了您"
-		} else {
+		} else if ms[i].Type == 1 || ms[i].Type == 2 || ms[i].Type == 3 {
 			var a model.Article
 			database.DB.Find(&a, "article_id=?", ms[i].ArticleId)
 			ms[i].Content = "用户" + op.Username + typeName + "了您的文章《" + a.ArticleName + "》"

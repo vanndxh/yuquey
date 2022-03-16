@@ -64,10 +64,10 @@ type Comment struct {
 type Message struct {
 	MessageId int       `gorm:"primary_key;AUTO_INCREASE"`
 	UserId    int       `gorm:"not null"`
-	Type      int       `gorm:"not null"` // 0-all 1-like 2-collection 3-comment 4-follow
+	Type      int       `gorm:"not null"` // 0-all 1-like 2-collection 3-comment 4-follow 5-other
 	Op        int       `gorm:"not null"`
 	ArticleId int       `gorm:""`
-	Content   string    `gorm:"-"`
+	Content   string    `gorm:""`
 	Read      int       `gorm:"not null"` // 1-no 2-yes
 	Time      time.Time `gorm:"not null"`
 }
