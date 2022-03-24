@@ -66,10 +66,10 @@ func CreateArticle(c *gin.Context) {
 
 func DeleteArticle(c *gin.Context) {
 	// 获取文章id
-	var a model.Article
 	articleId := c.DefaultQuery("articleId", "")
-	userId := c.DefaultQuery("userId", "")
 	// 删除操作
+	var a model.Article
+	database.DB.Find(&a, "article_id=?", articleId)
 	result := database.DB.Delete(&a, "article_id=?", articleId)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
@@ -77,7 +77,7 @@ func DeleteArticle(c *gin.Context) {
 	}
 	// 给用户文章总数--
 	var u model.User
-	result2 := database.DB.Find(&u, "user_id=?", userId)
+	result2 := database.DB.Find(&u, "user_id=?", a.ArticleAuthor)
 	if result2.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 		return
@@ -88,6 +88,30 @@ func DeleteArticle(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"msg": "文章删除成功！",
 	})
+}
+func DeleteAllArticle(c *gin.Context) {
+	userId, _ := strconv.Atoi(c.PostForm("userId"))
+	var as []model.Article
+	database.DB.Find(&as, "article_author=? AND is_in_trash=?", userId, 1)
+	for i := range as {
+		var a model.Article
+		result := database.DB.Delete(&a, "article_id=?", as[i].ArticleId)
+		if result.Error != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
+			return
+		}
+		// 给用户文章总数--
+		var u model.User
+		database.DB.Find(&a, "article_id=?", as[i].ArticleId)
+		result2 := database.DB.Find(&u, "user_id=?", a.ArticleAuthor)
+		if result2.Error != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
+			return
+		}
+		articleNow := u.ArticleAmount
+		database.DB.Model(&u).Update("article_amount", articleNow-1)
+	}
+	c.JSON(200, gin.H{"msg": "清空回收站成功！"})
 }
 
 func UpdateArticle(c *gin.Context) {

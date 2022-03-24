@@ -42,6 +42,7 @@ func main() {
 	V1article.GET("/getHotArticles", api.GetHotArticles)
 	V1article.GET("/getAllArticles", api.GetAllArticles)
 	V1article.GET("/getFollowArticles", api.GetFollowArticles)
+	V1article.DELETE("/deleteAllArticle", api.DeleteAllArticle)
 
 	// team
 	V1team := apiV1.Group("/team")
