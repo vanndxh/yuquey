@@ -7,6 +7,7 @@ type User struct {
 	Username       string    `gorm:"varchar(10);not null"`
 	Password       string    `gorm:"not null"`
 	UserInfo       string    `gorm:"varchar(60)"`
+	Sex            int       `gorm:"not null"`
 	Vip            time.Time `gorm:"not null"`
 	Authentication string    `gorm:""`
 	ArticleAmount  int       `gorm:"not null"`
@@ -14,6 +15,8 @@ type User struct {
 	FollowAmount   int       `gorm:"not null"`
 	FollowerAmount int       `gorm:"not null"`
 	ReadNotice     int       `gorm:"not null"`
+	Violation      int       `gorm:"not null"`
+	LatestTaskTime time.Time `gorm:"not null"`
 }
 
 type Article struct {

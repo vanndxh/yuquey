@@ -33,6 +33,31 @@ func SendMessage(c *gin.Context) {
 	}
 	c.JSON(200, gin.H{"msg": "ok"})
 }
+func HandleViolation(c *gin.Context) {
+	vioUserId, _ := strconv.Atoi(c.PostForm("vioUserId"))
+	vioContent := c.PostForm("vioContent")
+
+	var u model.User
+	database.DB.Find(&u, "user_id=?", vioUserId)
+	vioNow := u.Violation
+	database.DB.Model(&u).Where("user_id=?", vioUserId).Update("violation", vioNow+1)
+
+	messageContent := "用户您好，您的" + vioContent + "因违反小黑屋《用户须知》已被删除，目前您的违规次数为：" + strconv.Itoa(u.Violation) + "，请珍惜您的账号！"
+	newMessage := model.Message{
+		Content: messageContent,
+		Read:    1,
+		Time:    time.Now(),
+		UserId:  vioUserId,
+		Type:    5,
+	}
+
+	res := database.DB.Create(&newMessage).Error
+	if res != nil {
+		fmt.Println(res)
+		return
+	}
+	c.JSON(200, gin.H{"msg": "ok"})
+}
 
 func ReadMessage(c *gin.Context) {
 	messageId, err := strconv.Atoi(c.PostForm("messageId"))

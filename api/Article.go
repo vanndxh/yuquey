@@ -184,9 +184,10 @@ func GetArticles(c *gin.Context) { // 根据用户获取
 }
 func GetArticleInfo(c *gin.Context) {
 	// 获取数据
-	var a model.Article
-	articleId := c.DefaultQuery("articleId", "")
+	articleId := c.Query("articleId")
+	userId := c.Query("userId")
 	// 查找对应文章
+	var a model.Article
 	result := database.DB.Find(&a, "article_id=?", articleId)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
@@ -199,7 +200,10 @@ func GetArticleInfo(c *gin.Context) {
 		fmt.Println(res.Error)
 		return
 	}
-	// 浏览量
+	// 查看用户完成当日任务
+	var now = time.Now()
+	database.DB.Model(&u).Where("user_id=?", userId).Update("latest_task_time", now)
+	// 文章浏览量++
 	viewNow := a.ViewAmount
 	database.DB.Model(&a).Where("article_id=?", articleId).Update("view_amount", viewNow+1)
 	// 返回表单

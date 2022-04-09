@@ -67,7 +67,7 @@ func init() {
 	// 初始化管理员账号
 	adminUser := model.User{
 		Username:       "Vanndxh",
-		Password:       "123456",
+		Password:       "111111",
 		UserInfo:       "暂无~",
 		Authentication: "网站创始人",
 	}

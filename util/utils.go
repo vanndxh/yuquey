@@ -28,8 +28,10 @@ func CalculateHot() {
 		if len(u.Authentication) != 0 {
 			author *= 1.5 // 如果是认证号，再再1.5
 		}
+		// 违规次数权重
+		vio := float64(1 + u.Violation/10)
 		// 汇总计算
-		newHot := 1.0 * score * author / days
+		newHot := 1.0 * score * author / days / vio
 		// 更新
 		var a model.Article
 		if newHot != as[i].Hot {

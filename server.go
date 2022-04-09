@@ -85,6 +85,7 @@ func main() {
 	V1message.POST("/readAllMessages", api.ReadAllMessages)
 	V1message.GET("/getRead", api.GetRead)
 	V1message.POST("/sendMessage", api.SendMessage)
+	V1message.POST("/handleViolation", api.HandleViolation)
 
 	// timeline
 	V1timeline := apiV1.Group("/timeline")
