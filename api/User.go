@@ -29,6 +29,7 @@ func Register(c *gin.Context) {
 		fmt.Println(ok3, rePassword, "3")
 		return
 	}
+	sex, _ := strconv.Atoi(c.PostForm("sexValue"))
 	// 判断密码合理性
 	if len(password) == 0 {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
@@ -75,6 +76,7 @@ func Register(c *gin.Context) {
 		Username: username,
 		Password: password,
 		UserInfo: "暂无~",
+		Sex:      sex,
 	}
 	err := database.DB.Create(&newUser).Error
 	if err != nil {
@@ -146,20 +148,17 @@ func DeleteUser(c *gin.Context) {
 
 func UpdateUserInfo(c *gin.Context) {
 	// 获取数据
-	var u model.User
+	userId, _ := strconv.Atoi(c.PostForm("userId"))
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 	userInfo := c.PostForm("userInfo")
-	// 找到对应记录
-	result := database.DB.Find(&u, "user_id=?", 1)
-	if result.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
-		return
-	}
+	sex, _ := strconv.Atoi(c.PostForm("sex"))
 	// update
-	database.DB.Model(&u).Update("username", username)
-	database.DB.Model(&u).Update("password", password)
-	database.DB.Model(&u).Update("user_info", userInfo)
+	var u model.User
+	database.DB.Model(&u).Where("user_id=?", userId).Update("username", username)
+	database.DB.Model(&u).Where("user_id=?", userId).Update("password", password)
+	database.DB.Model(&u).Where("user_id=?", userId).Update("user_info", userInfo)
+	database.DB.Model(&u).Where("user_id=?", userId).Update("sex", sex)
 	// 返回结果
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "msg": "success", "data": "用户个人信息修改成功！"})
 }
