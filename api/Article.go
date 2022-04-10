@@ -90,7 +90,12 @@ func DeleteArticle(c *gin.Context) {
 	})
 }
 func DeleteAllArticle(c *gin.Context) {
-	userId, _ := strconv.Atoi(c.PostForm("userId"))
+	userId, err := strconv.Atoi(c.Query("userId"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	var as []model.Article
 	database.DB.Find(&as, "article_author=? AND is_in_trash=?", userId, 1)
 	for i := range as {
@@ -103,13 +108,14 @@ func DeleteAllArticle(c *gin.Context) {
 		// 给用户文章总数--
 		var u model.User
 		database.DB.Find(&a, "article_id=?", as[i].ArticleId)
-		result2 := database.DB.Find(&u, "user_id=?", a.ArticleAuthor)
+		result2 := database.DB.Find(&u, "user_id=?", userId)
 		if result2.Error != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest, "msg": result.Error.Error()})
 			return
 		}
 		articleNow := u.ArticleAmount
-		database.DB.Model(&u).Update("article_amount", articleNow-1)
+		var uu model.User
+		database.DB.Model(&uu).Where("user_id=?", userId).Update("article_amount", articleNow-1)
 	}
 	c.JSON(200, gin.H{"msg": "清空回收站成功！"})
 }

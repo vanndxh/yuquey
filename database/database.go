@@ -67,7 +67,7 @@ func init() {
 	// 初始化管理员账号
 	adminUser := model.User{
 		Username:       "Vanndxh",
-		Password:       "111111",
+		Password:       "123123",
 		UserInfo:       "暂无~",
 		Authentication: "网站创始人",
 	}
@@ -91,7 +91,8 @@ func init() {
 		newArticle := model.Article{
 			ArticleName:    "初始化文章" + strconv.Itoa(i),
 			ArticleContent: "本文章为初始化需要，没有实际内容，没有作者！",
-			ArticleAuthor:  99999,
+			ArticleAuthor:  1,
+			Time:           time.Now(),
 		}
 		DB.Create(&newArticle)
 	}
