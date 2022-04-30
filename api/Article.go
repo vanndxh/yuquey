@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 	"yuquey/database"
 	"yuquey/model"
@@ -272,4 +273,15 @@ func GetFollowArticles(c *gin.Context) {
 		as[i].AuthorName = u.Username
 	}
 	c.JSON(200, gin.H{"data": as})
+}
+func GetTags(c *gin.Context) {
+	var as []model.Article
+	database.DB.Find(&as)
+	m := make(map[string]int)
+	for i := range as {
+		for _, str := range strings.Split(as[i].Tag, ",") {
+			m[str]++
+		}
+	}
+	c.JSON(200, gin.H{"data": m})
 }
