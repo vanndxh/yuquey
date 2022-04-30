@@ -20,6 +20,7 @@ func CreateArticle(c *gin.Context) {
 		fmt.Println(err)
 		return
 	}
+	tag := c.PostForm("tag")
 
 	// 判断数据合理性
 	if len(articleName) == 0 {
@@ -42,6 +43,7 @@ func CreateArticle(c *gin.Context) {
 		ArticleContent: articleContent,
 		ArticleAuthor:  articleAuthor,
 		Time:           time.Now(),
+		Tag:            tag,
 	}
 	err2 := database.DB.Create(&newArticle).Error
 	if err2 != nil {

@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type User struct {
 	UserId         int       `gorm:"primary_key;AUTO_INCREASE"`
@@ -32,6 +34,7 @@ type Article struct {
 	CollectionAmount int       `gorm:"not null"`
 	IsInTrash        int       `gorm:"not null"` // 0-not 1-yes
 	Hot              float64   `gorm:"not null"`
+	Tag              string    `gorm:""`
 }
 
 type Team struct {
